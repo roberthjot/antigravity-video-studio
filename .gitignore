@@ -1,0 +1,33 @@
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv/
+venv/
+ENV/
+*.log
+
+# AI Model weights & binaries (> 50MB)
+*.onnx
+*.bin
+kokoro_model/
+
+# Final Video & Media Outputs (> 10MB)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+
+# Temporary Working Directories
+temp_clips/
+temp_clips_v2/
+video_punto_nemo/temp_clips/
+video_punto_nemo/temp_clips_v2/
+video_barcos_modernos/temp_clips/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini

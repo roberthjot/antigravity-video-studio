@@ -1,0 +1,1244 @@
+{
+  "title": "El Punto Nemo: El Lugar Más Aislado del Planeta",
+  "total_scenes": 32,
+  "soundtrack": "soundtrack_dinamico_8min.mp3",
+  "voice": "es-MX-JorgeNeural",
+  "resolution": "1920x1080",
+  "scenes": [
+    {
+      "id": 1,
+      "act": "Acto 1: Las Coordenadas del Aislamiento",
+      "text": "En medio de la inmensidad del océano Pacífico... existe un punto donde la soledad alcanza su expresión más aterradora. Las coordenadas: cuarenta y ocho grados cincuenta y dos minutos sur... ciento veintitrés grados veintitrés minutos oeste. Bienvenido al Punto Nemo.",
+      "media": "00_intro_video_olas.webm",
+      "is_video": true,
+      "motion": "zoom_in",
+      "sfx": "ocean_surge.wav",
+      "overlay": "card_01.png",
+      "candidates": [
+        {
+          "name": "00_intro_video_olas.webm",
+          "type": "video",
+          "title": "Video: Oleaje del Pacífico Sur"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "act": "Acto 1: Las Coordenadas del Aislamiento",
+      "text": "Conocido oficialmente como el Polo Oceánico de Inaccesibilidad, es el lugar de la superficie terrestre más alejado de cualquier masa continental o pedazo de tierra firme en todo el planeta.",
+      "media": "01_mapa_punto_nemo.jpg",
+      "is_video": false,
+      "motion": "zoom_in",
+      "sfx": "telemetry_beep.wav",
+      "overlay": "card_02.png",
+      "candidates": [
+        {
+          "name": "01_mapa_punto_nemo.jpg",
+          "type": "image",
+          "title": "Mapa Batimétrico Punto Nemo"
+        },
+        {
+          "name": "02_mapa_polo_inaccesibilidad.jpg",
+          "type": "image",
+          "title": "Mapa Polar de Inaccesibilidad"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "25_navegacion_sigilo_radar.jpg",
+          "type": "image",
+          "title": "Radar de Navegación Marina"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "act": "Acto 1: Las Coordenadas del Aislamiento",
+      "text": "La costa más cercana, un diminuto islote desierto en la Polinesia llamado Ducie, se encuentra a más de dos mil seiscientos ochenta y ocho kilómetros de distancia. Si naufragaras aquí... los seres humanos más cercanos a ti no estarían en barcos ni en islas.",
+      "media": "02_mapa_polo_inaccesibilidad.jpg",
+      "is_video": false,
+      "motion": "zoom_out",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "02_mapa_polo_inaccesibilidad.jpg",
+          "type": "image",
+          "title": "Mapa Polar de Inaccesibilidad"
+        },
+        {
+          "name": "01_mapa_punto_nemo.jpg",
+          "type": "image",
+          "title": "Mapa Batimétrico Punto Nemo"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "25_navegacion_sigilo_radar.jpg",
+          "type": "image",
+          "title": "Radar de Navegación Marina"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "act": "Acto 1: Las Coordenadas del Aislamiento",
+      "text": "Estarían a cuatrocientos kilómetros sobre tu cabeza... flotando en la oscuridad del espacio a bordo de la Estación Espacial Internacional cada vez que su órbita pasa justo por encima de este abismo.",
+      "media": "04_astronauta_cupola.jpg",
+      "is_video": false,
+      "motion": "drift_up_right",
+      "sfx": "radio_squelch.wav",
+      "overlay": "card_04.png",
+      "candidates": [
+        {
+          "name": "04_astronauta_cupola.jpg",
+          "type": "image",
+          "title": "Astronauta en Cúpula ISS"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "act": "Acto 2: Más Cerca del Espacio",
+      "text": "Pero su aislamiento extremo no es solo una curiosidad geográfica. Durante décadas, las agencias espaciales más poderosas del planeta han utilizado este punto exacto con un propósito siniestro y fascinante: el cementerio de naves espaciales.",
+      "media": "03_tierra_pacifico_desde_iss.jpg",
+      "is_video": false,
+      "motion": "pan_right",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "04_astronauta_cupola.jpg",
+          "type": "image",
+          "title": "Astronauta en Cúpula ISS"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "act": "Acto 2: Más Cerca del Espacio",
+      "text": "A más de cuatro mil metros de profundidad, descansan los restos de más de doscientas sesenta naves espaciales, satélites espía y colosales cargueros desintegrados por reingreso atmosférico.",
+      "media": "06_carguero_progress.jpg",
+      "is_video": false,
+      "motion": "zoom_in",
+      "sfx": null,
+      "overlay": "card_06.png",
+      "candidates": [
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "04_astronauta_cupola.jpg",
+          "type": "image",
+          "title": "Astronauta en Cúpula ISS"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "act": "Acto 2: Más Cerca del Espacio",
+      "text": "En marzo de dos mil uno, la legendaria estación espacial soviética Mir, con un peso de ciento cuarenta y tres toneladas, fue precipitada deliberadamente hacia la atmósfera, cruzando el cielo como una violenta bola de fuego antes de sepultarse para siempre en estas aguas.",
+      "media": "05_estacion_espacial_mir.jpg",
+      "is_video": false,
+      "motion": "drift_down_left",
+      "sfx": "reentry_roar.wav",
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "act": "Acto 2: Más Cerca del Espacio",
+      "text": "Titanio calcinado, aleaciones militares secretas y residuos atómicos yacen en la oscuridad eterna del lecho marino... en una tumba donde ningún ser humano jamás podrá descender a rescatarlos.",
+      "media": "07_reingreso_atmosferico_fuego.jpg",
+      "is_video": false,
+      "motion": "pan_left",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "act": "Acto 3: El Sonido The Bloop y el Abismo",
+      "text": "Sin embargo, el misterio más perturbador del Punto Nemo no cayó del cielo... emergió de las profundidades. En el verano de mil novecientos noventa y siete, los micrófonos submarinos de la agencia oceanográfica NOAA registraron una señal estremecedora.",
+      "media": "10_hidrofono_submarino.jpg",
+      "is_video": false,
+      "motion": "zoom_in",
+      "sfx": "sonar_ping.wav",
+      "overlay": "card_09.png",
+      "candidates": [
+        {
+          "name": "10_hidrofono_submarino.jpg",
+          "type": "image",
+          "title": "Hidrófono Submarino NOAA"
+        },
+        {
+          "name": "09_bloop_espectrograma.jpg",
+          "type": "image",
+          "title": "Espectrograma de The Bloop"
+        },
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        },
+        {
+          "name": "12_iceberg_antartida_criosismo.jpg",
+          "type": "image",
+          "title": "Criosismo de Hielo Antártico"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "act": "Acto 3: El Sonido The Bloop y el Abismo",
+      "text": "Bautizado como The Bloop, fue un sonido de ultra baja frecuencia tan descomunalmente potente que fue captado por hidrófonos separados por más de cinco mil kilómetros de distancia a lo largo de todo el océano Pacífico.",
+      "media": "09_bloop_espectrograma.jpg",
+      "is_video": false,
+      "motion": "pan_right",
+      "sfx": "deep_bloop.wav",
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "09_bloop_espectrograma.jpg",
+          "type": "image",
+          "title": "Espectrograma de The Bloop"
+        },
+        {
+          "name": "10_hidrofono_submarino.jpg",
+          "type": "image",
+          "title": "Hidrófono Submarino NOAA"
+        },
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        },
+        {
+          "name": "12_iceberg_antartida_criosismo.jpg",
+          "type": "image",
+          "title": "Criosismo de Hielo Antártico"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "act": "Acto 3: El Sonido The Bloop y el Abismo",
+      "text": "Su firma acústica se asemejaba al patrón de un ser biológico vivo, pero con una potencia varias veces superior al rugido de la ballena azul más gigantesca jamás documentada. Durante años, la sospecha de una criatura abisal desconocida desconcertó a la comunidad científica.",
+      "media": "15_submarino_profundidades.jpg",
+      "is_video": false,
+      "motion": "zoom_out",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        },
+        {
+          "name": "10_hidrofono_submarino.jpg",
+          "type": "image",
+          "title": "Hidrófono Submarino NOAA"
+        },
+        {
+          "name": "09_bloop_espectrograma.jpg",
+          "type": "image",
+          "title": "Espectrograma de The Bloop"
+        },
+        {
+          "name": "12_iceberg_antartida_criosismo.jpg",
+          "type": "image",
+          "title": "Criosismo de Hielo Antártico"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "act": "Acto 3: El Sonido The Bloop y el Abismo",
+      "text": "Años más tarde, los científicos determinaron que el sonido probablemente provino de un gigantesco criosismo: la fractura y colapso de una masa masiva de hielo en los confines de la Antártida, resonando a través del abismo oceánico.",
+      "media": "12_iceberg_antartida_criosismo.jpg",
+      "is_video": false,
+      "motion": "drift_up_right",
+      "sfx": "ice_crack.wav",
+      "overlay": "card_12.png",
+      "candidates": [
+        {
+          "name": "12_iceberg_antartida_criosismo.jpg",
+          "type": "image",
+          "title": "Criosismo de Hielo Antártico"
+        },
+        {
+          "name": "23_hielo_polar_antartico.jpg",
+          "type": "image",
+          "title": "Hielo Polar Antártico"
+        },
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "act": "Acto 4: El Desierto Biológico Marino",
+      "text": "Pero incluso sin monstruos marinos, la realidad biológica del Punto Nemo es aún más desoladora. Este sector se sitúa justo en el centro del Giro del Pacífico Sur, una gigantesca corriente oceánica circular que atrapa y aísla sus aguas.",
+      "media": "25_navegacion_sigilo_radar.jpg",
+      "is_video": false,
+      "motion": "pan_left",
+      "sfx": null,
+      "overlay": "card_13.png",
+      "candidates": [
+        {
+          "name": "25_navegacion_sigilo_radar.jpg",
+          "type": "image",
+          "title": "Radar de Navegación Marina"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "act": "Acto 4: El Desierto Biológico Marino",
+      "text": "Aquí no llegan corrientes ricas en nutrientes. No existe plancton suficiente, y por lo tanto, no hay cardúmenes de peces, ni tiburones, ni mamíferos marinos. Es el desierto biológico más estéril del planeta Tierra.",
+      "media": "03_tierra_pacifico_desde_iss.jpg",
+      "is_video": false,
+      "motion": "zoom_out",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "25_navegacion_sigilo_radar.jpg",
+          "type": "image",
+          "title": "Radar de Navegación Marina"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "act": "Acto 4: El Desierto Biológico Marino",
+      "text": "El agua en este abismo es tan transparente y desprovista de organismos vivos que la luz solar penetra hasta profundidades insólitas, creando un azul cobalto tan puro como aterrador.",
+      "media": "24_horizonte_vasto_atardecer.jpg",
+      "is_video": false,
+      "motion": "pan_right",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        },
+        {
+          "name": "25_navegacion_sigilo_radar.jpg",
+          "type": "image",
+          "title": "Radar de Navegación Marina"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "act": "Acto 5: La Ciudad de R'lyeh y Lovecraft",
+      "text": "Y es aquí donde la ciencia se cruza con una de las coincidencias más inquietantes de la historia. En mil novecientos veintiocho, el legendario maestro del terror H. P. Lovecraft escribió su célebre obra: La Llamada de Cthulhu.",
+      "media": "16_cthulhu_monstruo_marino.jpg",
+      "is_video": false,
+      "motion": "zoom_in",
+      "sfx": "cinematic_braam.wav",
+      "overlay": "card_16.png",
+      "candidates": [
+        {
+          "name": "16_cthulhu_monstruo_marino.jpg",
+          "type": "image",
+          "title": "Monstruo Abisal / Lovecraft"
+        },
+        {
+          "name": "18_criatura_abisal_mitologia.jpg",
+          "type": "image",
+          "title": "Criatura Abisal de las Sombras"
+        },
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "act": "Acto 5: La Ciudad de R'lyeh y Lovecraft",
+      "text": "En el texto, Lovecraft situó la ancestral ciudad sumergida de R'lyeh... casi exactamente en las mismas coordenadas del Punto Nemo, sesenta y seis años antes de que el ingeniero Hrvoje Lukatela las calculara matemáticamente en mil novecientos noventa y dos.",
+      "media": "18_criatura_abisal_mitologia.jpg",
+      "is_video": false,
+      "motion": "drift_down_left",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "18_criatura_abisal_mitologia.jpg",
+          "type": "image",
+          "title": "Criatura Abisal de las Sombras"
+        },
+        {
+          "name": "16_cthulhu_monstruo_marino.jpg",
+          "type": "image",
+          "title": "Monstruo Abisal / Lovecraft"
+        },
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "act": "Acto 5: La Ciudad de R'lyeh y Lovecraft",
+      "text": "¿Cómo pudo un escritor a principios del siglo veinte intuir con semejante precisión el punto más solitario de la Tierra, décadas antes de la existencia de satélites o supercomputadoras?",
+      "media": "16_cthulhu_monstruo_marino.jpg",
+      "is_video": false,
+      "motion": "pan_left",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "16_cthulhu_monstruo_marino.jpg",
+          "type": "image",
+          "title": "Monstruo Abisal / Lovecraft"
+        },
+        {
+          "name": "18_criatura_abisal_mitologia.jpg",
+          "type": "image",
+          "title": "Criatura Abisal de las Sombras"
+        },
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "act": "Acto 6: Expediciones y Silencio en Alta Mar",
+      "text": "A pesar de este vacío absoluto, existe un grupo reducido de seres humanos que se atreve a desafiar estas coordenadas: los navegantes profesionales de la regata The Ocean Race.",
+      "media": "22_operaciones_alta_mar.webm",
+      "is_video": true,
+      "motion": "zoom_in",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "22_operaciones_alta_mar.webm",
+          "type": "video",
+          "title": "Video: Barco en Alta Mar"
+        },
+        {
+          "name": "00_intro_video_olas.webm",
+          "type": "video",
+          "title": "Video: Oleaje del Pacífico Sur"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "act": "Acto 6: Expediciones y Silencio en Alta Mar",
+      "text": "Surcando los mares más tempestuosos del hemisferio sur, estos barcos navegan con vientos sostenidos de más de cien kilómetros por hora y olas colosales que superan la altura de un edificio de seis pisos.",
+      "media": "00_intro_video_olas.webm",
+      "is_video": true,
+      "motion": "zoom_in",
+      "sfx": "ocean_surge.wav",
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "00_intro_video_olas.webm",
+          "type": "video",
+          "title": "Video: Oleaje del Pacífico Sur"
+        },
+        {
+          "name": "22_operaciones_alta_mar.webm",
+          "type": "video",
+          "title": "Video: Barco en Alta Mar"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "act": "Acto 6: Expediciones y Silencio en Alta Mar",
+      "text": "Para estos marineros, la realidad es brutal: si sufres una emergencia médica grave, un incendio o la rotura del casco en el Punto Nemo... la ayuda simplemente no llegará. Los buques de rescate más veloces tardarían entre diez y catorce días en alcanzar tu posición.",
+      "media": "25_navegacion_sigilo_radar.jpg",
+      "is_video": false,
+      "motion": "drift_up_right",
+      "sfx": "telemetry_beep.wav",
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "25_navegacion_sigilo_radar.jpg",
+          "type": "image",
+          "title": "Radar de Navegación Marina"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "act": "Acto 6: Expediciones y Silencio en Alta Mar",
+      "text": "Durante las noches sin luna, la tripulación contempla un horizonte completamente negro donde el mar y el cielo se funden en una sola masa de oscuridad... una experiencia psicológica descrita por los capitanes como la máxima prueba de cordura en altamar.",
+      "media": "24_horizonte_vasto_atardecer.jpg",
+      "is_video": false,
+      "motion": "zoom_out",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        },
+        {
+          "name": "00_intro_video_olas.webm",
+          "type": "video",
+          "title": "Video: Oleaje del Pacífico Sur"
+        },
+        {
+          "name": "22_operaciones_alta_mar.webm",
+          "type": "video",
+          "title": "Video: Barco en Alta Mar"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "act": "Acto 7: La Gran Tumba de la Estación Espacial",
+      "text": "Pero el verdadero peligro que acecha sobre este océano viene de las alturas. Cada vez que una misión espacial concluye y es enviada hacia el Punto Nemo, se desencadena uno de los fenómenos físicos más destructivos creados por el ser humano.",
+      "media": "03_tierra_pacifico_desde_iss.jpg",
+      "is_video": false,
+      "motion": "pan_right",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "04_astronauta_cupola.jpg",
+          "type": "image",
+          "title": "Astronauta en Cúpula ISS"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "act": "Acto 7: La Gran Tumba de la Estación Espacial",
+      "text": "Al cruzar las capas densas de la atmósfera a veintisiete mil kilómetros por hora, la compresión de aire genera temperaturas de más de dos mil quinientos grados Celsius, envolviendo la nave en una gigantesca burbuja de plasma incandescente.",
+      "media": "07_reingreso_atmosferico_fuego.jpg",
+      "is_video": false,
+      "motion": "zoom_in",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "act": "Acto 7: La Gran Tumba de la Estación Espacial",
+      "text": "Mientras el aluminio y los paneles solares arden y se desintegran en milésimas de segundo, los tanques de titanio militar y las cámaras de combustión de acero inoxidable sobreviven, cayendo a cientos de kilómetros por hora sobre las aguas.",
+      "media": "06_carguero_progress.jpg",
+      "is_video": false,
+      "motion": "drift_down_left",
+      "sfx": null,
+      "overlay": "card_25.png",
+      "candidates": [
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "04_astronauta_cupola.jpg",
+          "type": "image",
+          "title": "Astronauta en Cúpula ISS"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "act": "Acto 7: La Gran Tumba de la Estación Espacial",
+      "text": "En el año dos mil treinta y uno, este cementerio acuático recibirá su huésped más ilustre. La Estación Espacial Internacional, el mayor artefacto científico construido en la historia de la humanidad, cumplirá el final de su misión.",
+      "media": "19_estacion_espacial_internacional.jpg",
+      "is_video": false,
+      "motion": "pan_left",
+      "sfx": "radio_squelch.wav",
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        },
+        {
+          "name": "04_astronauta_cupola.jpg",
+          "type": "image",
+          "title": "Astronauta en Cúpula ISS"
+        },
+        {
+          "name": "03_tierra_pacifico_desde_iss.jpg",
+          "type": "image",
+          "title": "Tierra desde la Estación Espacial"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "act": "Acto 7: La Gran Tumba de la Estación Espacial",
+      "text": "Con un peso astronómico de más de cuatrocientas veinte toneladas, la NASA y sus socios internacionales la dirigirán en una trayectoria suicida hacia el corazón del Punto Nemo, iluminando la noche con una tormenta de fragmentos ardientes.",
+      "media": "07_reingreso_atmosferico_fuego.jpg",
+      "is_video": false,
+      "motion": "zoom_in",
+      "sfx": "reentry_roar.wav",
+      "overlay": "card_27.png",
+      "candidates": [
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "act": "Acto 7: La Gran Tumba de la Estación Espacial",
+      "text": "Módulos de investigación, laboratorios espaciales y tres décadas de sueños científicos quedarán sumergidos para siempre a cuatro mil metros bajo las olas, reposando junto a la estación Mir en el lecho marino.",
+      "media": "05_estacion_espacial_mir.jpg",
+      "is_video": false,
+      "motion": "zoom_out",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "05_estacion_espacial_mir.jpg",
+          "type": "image",
+          "title": "Estación Espacial Rusa Mir"
+        },
+        {
+          "name": "07_reingreso_atmosferico_fuego.jpg",
+          "type": "image",
+          "title": "Reentrada Ígnea a la Atmósfera"
+        },
+        {
+          "name": "06_carguero_progress.jpg",
+          "type": "image",
+          "title": "Nave de Carga Progress"
+        },
+        {
+          "name": "19_estacion_espacial_internacional.jpg",
+          "type": "image",
+          "title": "Estación Espacial Internacional ISS"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "act": "Acto 8: El Último Abismo Inexplorado",
+      "text": "En las profundidades del Punto Nemo reina una presión de cuatrocientas atmósferas y una temperatura glacial. Un ambiente impenetrable donde la naturaleza no perdona errores y el tiempo parece haberse congelado.",
+      "media": "23_hielo_polar_antartico.jpg",
+      "is_video": false,
+      "motion": "pan_right",
+      "sfx": null,
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "23_hielo_polar_antartico.jpg",
+          "type": "image",
+          "title": "Hielo Polar Antártico"
+        },
+        {
+          "name": "12_iceberg_antartida_criosismo.jpg",
+          "type": "image",
+          "title": "Criosismo de Hielo Antártico"
+        },
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "act": "Acto 8: El Último Abismo Inexplorado",
+      "text": "Este lugar nos recuerda una verdad fundamental: por muy avanzada que sea nuestra tecnología y por muy lejos que lleguen nuestras naves espaciales, nuestro propio planeta aún guarda abismos insondables que jamás podremos controlar.",
+      "media": "15_submarino_profundidades.jpg",
+      "is_video": false,
+      "motion": "drift_up_right",
+      "sfx": "sonar_ping.wav",
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "15_submarino_profundidades.jpg",
+          "type": "image",
+          "title": "Submarino en el Abismo"
+        },
+        {
+          "name": "25_navegacion_sigilo_radar.jpg",
+          "type": "image",
+          "title": "Radar de Navegación Marina"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        },
+        {
+          "name": "00_intro_video_olas.webm",
+          "type": "video",
+          "title": "Video: Oleaje del Pacífico Sur"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "act": "Acto 8: El Último Abismo Inexplorado",
+      "text": "¿Serías capaz de resistir una sola noche flotando en soledad sobre el abismo del Punto Nemo? Cuéntanos tu teoría sobre los secretos de este océano en la sección de comentarios.",
+      "media": "21_atardecer_dorado_pacifico.jpg",
+      "is_video": false,
+      "motion": "zoom_out",
+      "sfx": null,
+      "overlay": "card_31.png",
+      "candidates": [
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        },
+        {
+          "name": "00_intro_video_olas.webm",
+          "type": "video",
+          "title": "Video: Oleaje del Pacífico Sur"
+        },
+        {
+          "name": "22_operaciones_alta_mar.webm",
+          "type": "video",
+          "title": "Video: Barco en Alta Mar"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "act": "Acto 8: El Último Abismo Inexplorado",
+      "text": "Si este recorrido por el rincón más aislado del planeta te ha cautivado, déjanos tu me gusta, comparte este video con otros amantes de los misterios y suscríbete para acompañarnos en nuestra próxima gran expedición. ¡Hasta la próxima historia!",
+      "media": "00_intro_video_olas.webm",
+      "is_video": true,
+      "motion": "zoom_in",
+      "sfx": "ocean_surge.wav",
+      "overlay": null,
+      "candidates": [
+        {
+          "name": "00_intro_video_olas.webm",
+          "type": "video",
+          "title": "Video: Oleaje del Pacífico Sur"
+        },
+        {
+          "name": "22_operaciones_alta_mar.webm",
+          "type": "video",
+          "title": "Video: Barco en Alta Mar"
+        },
+        {
+          "name": "21_atardecer_dorado_pacifico.jpg",
+          "type": "image",
+          "title": "Atardecer Dorado en el Océano"
+        },
+        {
+          "name": "24_horizonte_vasto_atardecer.jpg",
+          "type": "image",
+          "title": "Horizonte Vasto Oceánico"
+        }
+      ]
+    }
+  ],
+  "library": [
+    {
+      "name": "00_intro_video_olas.webm",
+      "type": "video",
+      "title": "Video: Oleaje del Pacífico Sur"
+    },
+    {
+      "name": "22_operaciones_alta_mar.webm",
+      "type": "video",
+      "title": "Video: Barco en Alta Mar"
+    },
+    {
+      "name": "01_mapa_punto_nemo.jpg",
+      "type": "image",
+      "title": "Mapa Batimétrico Punto Nemo"
+    },
+    {
+      "name": "02_mapa_polo_inaccesibilidad.jpg",
+      "type": "image",
+      "title": "Mapa Polar de Inaccesibilidad"
+    },
+    {
+      "name": "03_tierra_pacifico_desde_iss.jpg",
+      "type": "image",
+      "title": "Tierra desde la Estación Espacial"
+    },
+    {
+      "name": "04_astronauta_cupola.jpg",
+      "type": "image",
+      "title": "Astronauta en Cúpula ISS"
+    },
+    {
+      "name": "05_estacion_espacial_mir.jpg",
+      "type": "image",
+      "title": "Estación Espacial Rusa Mir"
+    },
+    {
+      "name": "06_carguero_progress.jpg",
+      "type": "image",
+      "title": "Nave de Carga Progress"
+    },
+    {
+      "name": "07_reingreso_atmosferico_fuego.jpg",
+      "type": "image",
+      "title": "Reentrada Ígnea a la Atmósfera"
+    },
+    {
+      "name": "09_bloop_espectrograma.jpg",
+      "type": "image",
+      "title": "Espectrograma de The Bloop"
+    },
+    {
+      "name": "10_hidrofono_submarino.jpg",
+      "type": "image",
+      "title": "Hidrófono Submarino NOAA"
+    },
+    {
+      "name": "12_iceberg_antartida_criosismo.jpg",
+      "type": "image",
+      "title": "Criosismo de Hielo Antártico"
+    },
+    {
+      "name": "15_submarino_profundidades.jpg",
+      "type": "image",
+      "title": "Submarino en el Abismo"
+    },
+    {
+      "name": "16_cthulhu_monstruo_marino.jpg",
+      "type": "image",
+      "title": "Monstruo Abisal / Lovecraft"
+    },
+    {
+      "name": "18_criatura_abisal_mitologia.jpg",
+      "type": "image",
+      "title": "Criatura Abisal de las Sombras"
+    },
+    {
+      "name": "19_estacion_espacial_internacional.jpg",
+      "type": "image",
+      "title": "Estación Espacial Internacional ISS"
+    },
+    {
+      "name": "21_atardecer_dorado_pacifico.jpg",
+      "type": "image",
+      "title": "Atardecer Dorado en el Océano"
+    },
+    {
+      "name": "23_hielo_polar_antartico.jpg",
+      "type": "image",
+      "title": "Hielo Polar Antártico"
+    },
+    {
+      "name": "24_horizonte_vasto_atardecer.jpg",
+      "type": "image",
+      "title": "Horizonte Vasto Oceánico"
+    },
+    {
+      "name": "25_navegacion_sigilo_radar.jpg",
+      "type": "image",
+      "title": "Radar de Navegación Marina"
+    }
+  ],
+  "sfx_options": [
+    {
+      "id": null,
+      "name": "Sin SFX"
+    },
+    {
+      "id": "ocean_surge.wav",
+      "name": "Oleaje y Viento Marino"
+    },
+    {
+      "id": "telemetry_beep.wav",
+      "name": "Radar y Telemetría"
+    },
+    {
+      "id": "radio_squelch.wav",
+      "name": "Radio de Astronautas (ISS)"
+    },
+    {
+      "id": "reentry_roar.wav",
+      "name": "Rugido de Reingreso Atmosférico"
+    },
+    {
+      "id": "sonar_ping.wav",
+      "name": "Sonar Submarino (NOAA)"
+    },
+    {
+      "id": "deep_bloop.wav",
+      "name": "Frecuencia Sub-Grave (The Bloop)"
+    },
+    {
+      "id": "ice_crack.wav",
+      "name": "Criosismo Antártico (Hielo)"
+    },
+    {
+      "id": "cinematic_braam.wav",
+      "name": "Impacto de Suspenso Cósmico"
+    }
+  ],
+  "motion_options": [
+    {
+      "id": "zoom_in",
+      "name": "Zoom In Suave (Acercar)"
+    },
+    {
+      "id": "zoom_out",
+      "name": "Zoom Out (Alejar / Revelar)"
+    },
+    {
+      "id": "pan_right",
+      "name": "Panorámica Derecha (Barrido)"
+    },
+    {
+      "id": "pan_left",
+      "name": "Panorámica Izquierda (Barrido)"
+    },
+    {
+      "id": "drift_up_right",
+      "name": "Drift Diagonal Arriba"
+    },
+    {
+      "id": "drift_down_left",
+      "name": "Drift Diagonal Abajo"
+    }
+  ]
+}

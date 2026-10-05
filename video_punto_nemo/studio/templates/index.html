@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Studio · El Punto Nemo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              400: '#22d3ee',
+              500: '#06b6d4',
+              glow: '#00e5ff'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #070b14; color: #e2e8f0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .glass-card { background: rgba(13, 21, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(30, 41, 59, 0.8); }
+    .glass-card:hover { border-color: rgba(6, 182, 212, 0.4); }
+    .glow-active { box-shadow: 0 0 18px rgba(0, 229, 255, 0.35); border-color: #00e5ff !important; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #070b14; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #0891b2; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <div id="app" class="flex flex-col flex-1">
+    
+    <!-- TOP NAVBAR -->
+    <header class="sticky top-0 z-40 bg-[#070b14]/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-2xl">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <i class="fa-solid fa-clapperboard text-white text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-bold text-lg text-white tracking-wide">Antigravity Video Studio</h1>
+            <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">8 MIN MASTER</span>
+          </div>
+          <p class="text-xs text-slate-400">Curaduría Visual, Voces y Música · El Punto Nemo</p>
+        </div>
+      </div>
+
+      <!-- Center: Music Selector & Player -->
+      <div class="flex items-center space-x-2 bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-slate-800 text-xs">
+        <i class="fa-solid fa-music text-cyan-400"></i>
+        <span class="text-slate-400 font-medium hidden sm:inline">Música:</span>
+        <select v-model="project.soundtrack" @change="onSoundtrackChange" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1 outline-none max-w-[180px] truncate">
+          <option v-for="m in project.music_options" :key="m.file" :value="m.file">{{ m.title }}</option>
+        </select>
+        <button @click="toggleSoundtrack" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center space-x-1 transition" :class="isPlayingMusic ? 'bg-cyan-500 text-slate-950' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'">
+          <i :class="isPlayingMusic ? 'fa-solid fa-pause' : 'fa-solid fa-play'"></i>
+          <span>{{ isPlayingMusic ? 'Pausar' : 'Escuchar' }}</span>
+        </button>
+        <button @click="triggerMusicUpload" class="p-1 rounded-md bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700" title="Subir música propia (MP3)">
+          <i class="fa-solid fa-plus text-xs"></i>
+        </button>
+        <audio ref="soundtrackAudio" :src="'/media/music/' + (project.soundtrack || 'soundtrack_dinamico_8min.mp3')"></audio>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-2.5">
+        <button @click="openVoiceModal" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center space-x-1.5 transition border border-slate-700">
+          <i class="fa-solid fa-microphone-lines text-cyan-400"></i>
+          <span>Cambiar Voz</span>
+        </button>
+        <button @click="openVideoModal" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center space-x-1.5 transition border border-slate-700">
+          <i class="fa-solid fa-film text-purple-400"></i>
+          <span>Ver Master</span>
+        </button>
+        <button @click="saveProject" :disabled="isSaving" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold flex items-center space-x-1.5 transition border border-slate-700">
+          <i class="fa-solid fa-floppy-disk text-emerald-400"></i>
+          <span>{{ isSaving ? 'Guardando...' : 'Guardar' }}</span>
+        </button>
+        <button @click="startRender" class="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-lg shadow-cyan-500/25 transition">
+          <i class="fa-solid fa-bolt"></i>
+          <span>Renderizar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- SUBHEADER / ACT FILTER BAR -->
+    <div class="bg-slate-900/60 border-b border-slate-800/80 px-6 py-2.5 flex items-center justify-between text-xs overflow-x-auto">
+      <div class="flex items-center space-x-2 min-w-max">
+        <span class="text-slate-400 font-medium mr-1"><i class="fa-solid fa-filter text-slate-500 mr-1"></i>Actos:</span>
+        <button @click="selectedActFilter = 'all'" class="px-3 py-1 rounded-md transition font-medium" :class="selectedActFilter === 'all' ? 'bg-cyan-500 text-slate-950 font-semibold shadow' : 'bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200'">
+          Todos (32 Escenas)
+        </button>
+        <button v-for="actNum in 8" :key="actNum" @click="selectedActFilter = actNum" class="px-3 py-1 rounded-md transition font-medium" :class="selectedActFilter === actNum ? 'bg-cyan-500 text-slate-950 font-semibold shadow' : 'bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200'">
+          Acto {{ actNum }}
+        </button>
+      </div>
+      <div class="hidden lg:flex items-center space-x-4 text-slate-400 min-w-max">
+        <span><i class="fa-solid fa-microphone text-cyan-400 mr-1"></i> Voz actual: <strong class="text-slate-200">{{ project.voice || 'es-MX-JorgeNeural' }}</strong></span>
+        <span><i class="fa-solid fa-tv text-cyan-400 mr-1"></i> Formato: <strong class="text-slate-200">1080p 16:9</strong></span>
+      </div>
+    </div>
+
+    <!-- MAIN SCENE LIST -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+      
+      <!-- Notifications Toast -->
+      <div v-if="toastMsg" class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl bg-slate-900 border border-cyan-500 text-slate-100 shadow-2xl flex items-center space-x-3 text-sm animate-bounce">
+        <i class="fa-solid fa-circle-check text-cyan-400 text-lg"></i>
+        <span>{{ toastMsg }}</span>
+      </div>
+
+      <!-- Scene Cards Loop -->
+      <div v-for="sc in filteredScenes" :key="sc.id" class="glass-card rounded-2xl p-5 shadow-xl transition space-y-4">
+        
+        <!-- Scene Header -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+          <div class="flex items-center space-x-3">
+            <span class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-cyan-400 font-bold flex items-center justify-center text-sm">
+              #{{ String(sc.id).padStart(2, '0') }}
+            </span>
+            <div>
+              <span class="text-xs font-semibold text-cyan-400 tracking-wider uppercase">{{ sc.act }}</span>
+              <h3 class="text-sm font-bold text-white">Escena {{ sc.id }} de {{ project.total_scenes }}</h3>
+            </div>
+          </div>
+
+          <!-- Scene Voice Preview Player -->
+          <div class="flex items-center space-x-2">
+            <button @click="playSceneVoice(sc)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center space-x-1.5 border border-slate-700 transition">
+              <i :class="activeVoiceId === sc.id ? 'fa-solid fa-pause text-cyan-400' : 'fa-solid fa-volume-high text-cyan-400'"></i>
+              <span>{{ activeVoiceId === sc.id ? 'Pausar' : 'Escuchar Voz' }}</span>
+            </button>
+            <span v-if="sc.overlay" class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-blue-950/80 text-blue-300 border border-blue-800">
+              <i class="fa-solid fa-id-card mr-1"></i> Lower Third Activo
+            </span>
+          </div>
+        </div>
+
+        <!-- Script Text -->
+        <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/60 text-sm text-slate-300 leading-relaxed italic">
+          "{{ sc.text }}"
+        </div>
+
+        <!-- Media Selector: Core Feature -->
+        <div>
+          <div class="flex items-center justify-between mb-2.5">
+            <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center">
+              <i class="fa-regular fa-images text-cyan-400 mr-2"></i>
+              Imágenes y Videos Candidatos
+              <span class="ml-2 text-[11px] font-normal text-slate-400">(Clic para activar · 🗑️ para eliminar)</span>
+            </label>
+            <div class="flex items-center space-x-2">
+              <button @click="openWikimediaModal(sc)" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 transition flex items-center space-x-1">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Buscar en Internet</span>
+              </button>
+              <button @click="triggerFileUpload(sc.id)" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 transition flex items-center space-x-1">
+                <i class="fa-solid fa-upload"></i>
+                <span>Subir Archivo</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Candidates Grid with Delete Buttons -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            <div v-for="cand in sc.candidates" :key="cand.name" 
+                 class="group relative rounded-xl overflow-hidden cursor-pointer border-2 transition duration-200 bg-slate-900"
+                 :class="sc.media === cand.name ? 'glow-active border-cyan-400' : 'border-slate-800 hover:border-slate-600'">
+              
+              <!-- Thumbnail View (Click to select) -->
+              <div @click="selectMediaForScene(sc, cand)" class="aspect-video w-full overflow-hidden bg-black flex items-center justify-center relative">
+                <img v-if="cand.type === 'image'" :src="'/media/optimized/' + cand.name" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+                <video v-else :src="'/media/video/' + cand.name" class="w-full h-full object-cover" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>
+                
+                <!-- Type Badge -->
+                <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase backdrop-blur-md"
+                      :class="cand.type === 'video' ? 'bg-purple-900/90 text-purple-200 border border-purple-700' : 'bg-slate-900/80 text-slate-300 border border-slate-700'">
+                  <i :class="cand.type === 'video' ? 'fa-solid fa-video mr-1' : 'fa-regular fa-image mr-1'"></i>
+                  {{ cand.type === 'video' ? 'Video' : 'Foto' }}
+                </span>
+
+                <!-- Active Indicator Badge -->
+                <span v-if="sc.media === cand.name" class="absolute bottom-1.5 right-1.5 px-2 py-0.5 rounded text-[11px] font-extrabold bg-cyan-400 text-slate-950 shadow-md flex items-center space-x-1">
+                  <i class="fa-solid fa-check"></i>
+                  <span>ACTIVO</span>
+                </span>
+              </div>
+
+              <!-- DELETE CANDIDATE BUTTON (Trash Icon) -->
+              <button @click.stop="deleteCandidate(sc, cand)" 
+                      class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-red-600/90 hover:bg-red-500 text-white flex items-center justify-center shadow-lg transition opacity-80 group-hover:opacity-100"
+                      title="Eliminar esta imagen de la escena">
+                <i class="fa-solid fa-trash-can text-[11px]"></i>
+              </button>
+
+              <!-- Media Info -->
+              <div @click="selectMediaForScene(sc, cand)" class="p-2 text-left">
+                <p class="text-[11px] font-medium text-slate-200 truncate" :title="cand.title || cand.name">{{ cand.title || cand.name }}</p>
+              </div>
+            </div>
+
+            <!-- "Add More" Tile -->
+            <div @click="openLibraryModal(sc)" class="border-2 border-dashed border-slate-800 hover:border-cyan-500/60 rounded-xl flex flex-col items-center justify-center p-4 cursor-pointer text-slate-500 hover:text-cyan-400 transition bg-slate-900/40 aspect-video">
+              <i class="fa-solid fa-plus text-lg mb-1"></i>
+              <span class="text-xs font-semibold">Biblioteca</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Row: Camera Motion & SFX -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-800/80">
+          
+          <!-- Motion Selector -->
+          <div class="flex items-center space-x-3 bg-slate-900/70 px-3.5 py-2.5 rounded-xl border border-slate-800">
+            <span class="text-xs font-semibold text-slate-400 whitespace-nowrap"><i class="fa-solid fa-arrows-up-down-left-right text-cyan-400 mr-2"></i>Movimiento de Cámara:</span>
+            <select v-model="sc.motion" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 flex-1 focus:ring-1 focus:ring-cyan-500 outline-none">
+              <option v-for="m in project.motion_options" :key="m.id" :value="m.id">{{ m.name }}</option>
+            </select>
+          </div>
+
+          <!-- SFX Selector -->
+          <div class="flex items-center space-x-3 bg-slate-900/70 px-3.5 py-2.5 rounded-xl border border-slate-800">
+            <span class="text-xs font-semibold text-slate-400 whitespace-nowrap"><i class="fa-solid fa-wand-magic-sparkles text-cyan-400 mr-2"></i>Efecto de Sonido:</span>
+            <select v-model="sc.sfx" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 flex-1 focus:ring-1 focus:ring-cyan-500 outline-none">
+              <option v-for="s in project.sfx_options" :key="s.id" :value="s.id">{{ s.name }}</option>
+            </select>
+            <button v-if="sc.sfx" @click="playSFX(sc.sfx)" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 transition" title="Escuchar este efecto">
+              <i class="fa-solid fa-play text-xs"></i>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+    <!-- HIDDEN AUDIO PLAYERS & INPUTS -->
+    <audio ref="voiceAudio"></audio>
+    <audio ref="sfxAudio"></audio>
+    <audio ref="sampleVoiceAudio"></audio>
+    <input type="file" ref="fileInput" class="hidden" accept="image/*,video/*" @change="onFileUploaded" />
+    <input type="file" ref="musicInput" class="hidden" accept="audio/*" @change="onMusicUploaded" />
+
+    <!-- VOICE CONFIGURATION MODAL -->
+    <div v-if="showVoiceModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-microphone-lines text-cyan-400 text-lg"></i>
+            <h3 class="font-bold text-white text-base">Configuración de Voz del Narrador</h3>
+          </div>
+          <button @click="showVoiceModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <p class="text-xs text-slate-300">
+          Elige la voz del locutor profesional. Puedes probar una muestra de audio antes de aplicar el cambio a todas las 32 escenas del documental.
+        </p>
+
+        <!-- Voice Options List -->
+        <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+          <div v-for="v in project.available_voices" :key="v.id" 
+               @click="selectedVoiceId = v.id"
+               class="p-3 rounded-xl border cursor-pointer transition flex items-center justify-between"
+               :class="selectedVoiceId === v.id ? 'bg-cyan-950/60 border-cyan-400 text-white' : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:border-slate-500'">
+            <div>
+              <div class="font-semibold text-xs text-white">{{ v.name }}</div>
+              <div class="text-[11px] text-slate-400">{{ v.lang }} · {{ v.gender === 'male' ? 'Masculina' : 'Femenina' }}</div>
+            </div>
+            <button @click.stop="playVoiceSample(v.id)" class="px-2.5 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-cyan-300 text-xs flex items-center space-x-1">
+              <i class="fa-solid fa-play text-[10px]"></i>
+              <span>Probar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Regeneration Progress Bar if Running -->
+        <div v-if="voiceRegenStatus.running" class="space-y-2 bg-slate-950 p-4 rounded-xl border border-slate-800">
+          <div class="flex justify-between text-xs font-semibold text-cyan-400">
+            <span>{{ voiceRegenStatus.message }}</span>
+            <span>{{ voiceRegenStatus.progress }}%</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div class="bg-cyan-500 h-full rounded-full transition-all duration-300" :style="{ width: voiceRegenStatus.progress + '%' }"></div>
+          </div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="pt-2 flex items-center justify-end space-x-3">
+          <button @click="showVoiceModal = false" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition">
+            Cerrar
+          </button>
+          <button @click="applyNewVoice" :disabled="voiceRegenStatus.running" class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg flex items-center space-x-2">
+            <i class="fa-solid fa-arrows-rotate" :class="{ 'fa-spin': voiceRegenStatus.running }"></i>
+            <span>{{ voiceRegenStatus.running ? 'Regenerando...' : 'Aplicar a Todo el Video' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIKIMEDIA SEARCH MODAL -->
+    <div v-if="showWikiModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-earth-americas text-cyan-400 text-lg"></i>
+            <h3 class="font-bold text-white text-base">Buscar Imágenes Libres en Wikimedia</h3>
+          </div>
+          <button @click="showWikiModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div class="p-5 space-y-4 flex-1 overflow-y-auto">
+          <div class="flex space-x-2">
+            <input v-model="wikiQuery" @keyup.enter="searchWikimedia" type="text" placeholder="Ej: Pacific ocean storm, NASA ISS, Antarctica iceberg, Sonar..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 outline-none" />
+            <button @click="searchWikimedia" :disabled="isSearchingWiki" class="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-sm flex items-center space-x-2 transition">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>{{ isSearchingWiki ? 'Buscando...' : 'Buscar' }}</span>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5 text-xs">
+            <span class="text-slate-400 mr-1 self-center">Sugerencias:</span>
+            <button v-for="tag in ['South Pacific ocean', 'NASA ISS cupola', 'Russian Mir station', 'Ocean abyss sonar', 'Antarctica iceberg collapse', 'Satellite Earth Pacific']" 
+                    :key="tag" @click="wikiQuery = tag; searchWikimedia()" class="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700">
+              {{ tag }}
+            </button>
+          </div>
+
+          <div v-if="wikiResults.length > 0" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div v-for="res in wikiResults" :key="res.url" class="group bg-slate-950 border border-slate-800 hover:border-cyan-400 rounded-xl overflow-hidden flex flex-col justify-between">
+              <div class="aspect-video bg-black flex items-center justify-center overflow-hidden">
+                <img :src="res.thumb || res.url" class="w-full h-full object-cover group-hover:scale-105 transition" />
+              </div>
+              <div class="p-2 space-y-2 flex-1 flex flex-col justify-between">
+                <p class="text-[11px] text-slate-300 line-clamp-2" :title="res.title">{{ res.title }}</p>
+                <button @click="importWikimediaImage(res)" :disabled="isImporting" class="w-full py-1.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded text-xs transition">
+                  <i class="fa-solid fa-download mr-1"></i> Usar esta
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else-if="!isSearchingWiki && searchDone" class="text-center py-8 text-slate-500 text-sm">
+            No se encontraron imágenes para esta búsqueda. Intenta con palabras clave en inglés.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIBRARY MODAL -->
+    <div v-if="showLibraryModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-folder-open text-cyan-400 text-lg"></i>
+            <h3 class="font-bold text-white text-base">Biblioteca Completa del Proyecto ({{ project.library.length }} archivos)</h3>
+          </div>
+          <button @click="showLibraryModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div class="p-5 overflow-y-auto flex-1">
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+            <div v-for="item in project.library" :key="item.name" 
+                 @click="pickFromLibrary(item)"
+                 class="group rounded-xl overflow-hidden border border-slate-800 hover:border-cyan-400 cursor-pointer bg-slate-950 p-1 flex flex-col justify-between">
+              <div class="aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center">
+                <img v-if="item.type === 'image'" :src="'/media/optimized/' + item.name" class="w-full h-full object-cover group-hover:scale-105 transition" />
+                <video v-else :src="'/media/video/' + item.name" class="w-full h-full object-cover"></video>
+              </div>
+              <p class="text-[11px] text-slate-300 truncate mt-1.5 px-1">{{ item.title || item.name }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RENDER PROGRESS MODAL -->
+    <div v-if="showRenderModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="glass-card bg-slate-900 border border-cyan-500/50 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl text-center">
+        
+        <div class="w-16 h-16 rounded-full bg-cyan-950 border border-cyan-500 flex items-center justify-center mx-auto shadow-lg shadow-cyan-500/30">
+          <i v-if="!renderStatus.done && !renderStatus.error" class="fa-solid fa-spinner fa-spin text-2xl text-cyan-400"></i>
+          <i v-else-if="renderStatus.done" class="fa-solid fa-circle-check text-2xl text-emerald-400"></i>
+          <i v-else class="fa-solid fa-triangle-exclamation text-2xl text-red-400"></i>
+        </div>
+
+        <div class="space-y-1">
+          <h3 class="text-lg font-bold text-white">{{ renderStatus.done ? '¡Video Completado!' : 'Renderizando Documental...' }}</h3>
+          <p class="text-xs text-slate-400">{{ renderStatus.message }}</p>
+        </div>
+
+        <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden p-0.5 border border-slate-700">
+          <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-300" :style="{ width: renderStatus.progress + '%' }"></div>
+        </div>
+        <div class="text-xs font-bold text-cyan-400">{{ renderStatus.progress }}%</div>
+
+        <div v-if="renderStatus.done" class="pt-2 flex items-center justify-center space-x-3">
+          <button @click="showRenderModal = false; openVideoModal()" class="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center space-x-2 transition shadow-lg">
+            <i class="fa-solid fa-play"></i>
+            <span>Ver Video Terminado</span>
+          </button>
+          <button @click="showRenderModal = false" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs transition">
+            Cerrar
+          </button>
+        </div>
+
+        <div v-if="renderStatus.error" class="pt-2">
+          <button @click="showRenderModal = false" class="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-bold">
+            Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FINAL MASTER VIDEO PLAYER MODAL -->
+    <div v-if="showVideoModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl max-w-5xl w-full flex flex-col shadow-2xl overflow-hidden">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-circle-play text-cyan-400 text-lg"></i>
+            <h3 class="font-bold text-white text-sm">Reproductor Master: Documental El Punto Nemo (8 Minutos)</h3>
+          </div>
+          <button @click="showVideoModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div class="p-4 bg-black flex items-center justify-center">
+          <video src="/media/final/documental_punto_nemo_8MIN_MONETIZABLE.mp4" controls autoplay class="w-full max-h-[70vh] rounded-lg shadow-2xl"></video>
+        </div>
+
+        <div class="p-3.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span>Resolución: <strong>1920x1080 30fps</strong> · Audio: <strong>Voz + BGM + 12 SFX</strong></span>
+          <a href="/media/final/documental_punto_nemo_8MIN_MONETIZABLE.mp4" download class="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-download"></i>
+            <span>Descargar Archivo MP4</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const project = ref({ total_scenes: 0, scenes: [], library: [], sfx_options: [], motion_options: [], music_options: [], available_voices: [], soundtrack: 'soundtrack_dinamico_8min.mp3', voice: 'es-MX-JorgeNeural' });
+        const selectedActFilter = ref('all');
+        const isSaving = ref(false);
+        const toastMsg = ref('');
+        const isPlayingMusic = ref(false);
+        const activeVoiceId = ref(null);
+        
+        // Modals
+        const showVideoModal = ref(false);
+        const showLibraryModal = ref(false);
+        const showWikiModal = ref(false);
+        const showRenderModal = ref(false);
+        const showVoiceModal = ref(false);
+        const activeTargetScene = ref(null);
+
+        // Voice state
+        const selectedVoiceId = ref('es-MX-JorgeNeural');
+        const voiceRegenStatus = ref({ running: false, progress: 0, message: '' });
+
+        // Wikimedia state
+        const wikiQuery = ref('');
+        const wikiResults = ref([]);
+        const isSearchingWiki = ref(false);
+        const isImporting = ref(false);
+        const searchDone = ref(false);
+
+        // Render Status
+        const renderStatus = ref({ running: false, progress: 0, message: '', done: false, error: null });
+
+        // Refs
+        const soundtrackAudio = ref(null);
+        const voiceAudio = ref(null);
+        const sfxAudio = ref(null);
+        const sampleVoiceAudio = ref(null);
+        const fileInput = ref(null);
+        const musicInput = ref(null);
+        let uploadTargetSceneId = null;
+
+        const showToast = (msg) => {
+          toastMsg.value = msg;
+          setTimeout(() => { toastMsg.value = ''; }, 3000);
+        };
+
+        const loadProject = async () => {
+          try {
+            const res = await fetch('/api/project');
+            project.value = await res.json();
+            if (project.value.voice) selectedVoiceId.value = project.value.voice;
+          } catch (e) {
+            console.error('Error cargando proyecto:', e);
+          }
+        };
+
+        const filteredScenes = computed(() => {
+          if (selectedActFilter.value === 'all') return project.value.scenes || [];
+          return (project.value.scenes || []).filter(sc => sc.act.startsWith(`Acto ${selectedActFilter.value}:`));
+        });
+
+        const toggleSoundtrack = () => {
+          if (!soundtrackAudio.value) return;
+          if (isPlayingMusic.value) {
+            soundtrackAudio.value.pause();
+            isPlayingMusic.value = false;
+          } else {
+            soundtrackAudio.value.volume = 0.35;
+            soundtrackAudio.value.play();
+            isPlayingMusic.value = true;
+          }
+        };
+
+        const onSoundtrackChange = () => {
+          if (soundtrackAudio.value) {
+            soundtrackAudio.value.load();
+            if (isPlayingMusic.value) soundtrackAudio.value.play();
+          }
+          showToast(`Música cambiada a: ${project.value.soundtrack}`);
+        };
+
+        const triggerMusicUpload = () => {
+          if (musicInput.value) musicInput.value.click();
+        };
+
+        const onMusicUploaded = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const formData = new FormData();
+          formData.append('file', file);
+
+          showToast('Subiendo pista de música...');
+          try {
+            const res = await fetch('/api/music/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.status === 'ok') {
+              await loadProject();
+              showToast(`✓ Música "${data.title}" agregada y seleccionada`);
+            }
+          } catch (err) {
+            alert('Error subiendo música: ' + err);
+          }
+          e.target.value = '';
+        };
+
+        const playSceneVoice = (sc) => {
+          if (!voiceAudio.value) return;
+          if (activeVoiceId.value === sc.id) {
+            voiceAudio.value.pause();
+            activeVoiceId.value = null;
+          } else {
+            const padId = String(sc.id).padStart(2, '0');
+            voiceAudio.value.src = `/media/audio/master_audio_${padId}.mp3?t=${Date.now()}`;
+            voiceAudio.value.play();
+            activeVoiceId.value = sc.id;
+            voiceAudio.value.onended = () => { activeVoiceId.value = null; };
+          }
+        };
+
+        const playSFX = (sfxFile) => {
+          if (!sfxAudio.value || !sfxFile) return;
+          sfxAudio.value.src = `/media/sfx/${sfxFile}`;
+          sfxAudio.value.play();
+        };
+
+        const selectMediaForScene = (sc, cand) => {
+          sc.media = cand.name;
+          sc.is_video = (cand.type === 'video');
+          showToast(`Escena ${sc.id}: Selección cambiada a "${cand.title || cand.name}"`);
+        };
+
+        const deleteCandidate = async (sc, cand) => {
+          try {
+            const res = await fetch('/api/scene/delete-candidate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ scene_id: sc.id, media_name: cand.name })
+            });
+            const data = await res.json();
+            if (data.status === 'ok') {
+              sc.candidates = sc.candidates.filter(c => c.name !== cand.name);
+              if (sc.media === cand.name) {
+                if (sc.candidates.length > 0) {
+                  sc.media = sc.candidates[0].name;
+                  sc.is_video = (sc.candidates[0].type === 'video');
+                }
+              }
+              showToast(`🗑️ "${cand.title || cand.name}" eliminada de Escena ${sc.id}`);
+            }
+          } catch (e) {
+            console.error('Error eliminando candidato:', e);
+          }
+        };
+
+        const saveProject = async () => {
+          isSaving.value = true;
+          try {
+            await fetch('/api/project/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(project.value)
+            });
+            showToast('✓ Cambios guardados correctamente en el proyecto');
+          } catch (e) {
+            alert('Error guardando: ' + e);
+          } finally {
+            isSaving.value = false;
+          }
+        };
+
+        // Voice modal & regeneration
+        const openVoiceModal = () => { showVoiceModal.value = true; };
+
+        const playVoiceSample = async (voiceId) => {
+          try {
+            const res = await fetch(`/api/voice/sample?voice_id=${voiceId}`);
+            const data = await res.json();
+            if (data.url && sampleVoiceAudio.value) {
+              sampleVoiceAudio.value.src = data.url;
+              sampleVoiceAudio.value.play();
+            }
+          } catch (e) {
+            console.error('Error probando voz:', e);
+          }
+        };
+
+        const applyNewVoice = async () => {
+          try {
+            await fetch('/api/voice/regenerate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ voice_id: selectedVoiceId.value })
+            });
+            pollVoiceStatus();
+          } catch (e) {
+            alert('Error regenerando voz: ' + e);
+          }
+        };
+
+        const pollVoiceStatus = () => {
+          const interval = setInterval(async () => {
+            try {
+              const res = await fetch('/api/voice/status');
+              voiceRegenStatus.value = await res.json();
+              if (!voiceRegenStatus.value.running) {
+                clearInterval(interval);
+                await loadProject();
+                showToast(`✓ Locuciones actualizadas a ${selectedVoiceId.value}`);
+              }
+            } catch (e) {
+              clearInterval(interval);
+            }
+          }, 1200);
+        };
+
+        const triggerFileUpload = (sceneId) => {
+          uploadTargetSceneId = sceneId;
+          if (fileInput.value) fileInput.value.click();
+        };
+
+        const onFileUploaded = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const formData = new FormData();
+          formData.append('file', file);
+          if (uploadTargetSceneId) formData.append('scene_id', uploadTargetSceneId);
+
+          showToast('Subiendo y optimizando archivo a 1080p...');
+          try {
+            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.status === 'ok') {
+              await loadProject();
+              showToast(`✓ Archivo "${data.file}" asignado con éxito`);
+            }
+          } catch (err) {
+            alert('Error subiendo: ' + err);
+          }
+          e.target.value = '';
+        };
+
+        const openWikimediaModal = (sc) => {
+          activeTargetScene.value = sc;
+          wikiQuery.value = sc.act.split(':')[1]?.trim() || 'Pacific Ocean';
+          wikiResults.value = [];
+          searchDone.value = false;
+          showWikiModal.value = true;
+        };
+
+        const searchWikimedia = async () => {
+          if (!wikiQuery.value.trim()) return;
+          isSearchingWiki.value = true;
+          searchDone.value = false;
+          try {
+            const res = await fetch(`/api/search-wikimedia?q=${encodeURIComponent(wikiQuery.value)}`);
+            const data = await res.json();
+            wikiResults.value = data.results || [];
+          } catch (e) {
+            console.error(e);
+          } finally {
+            isSearchingWiki.value = false;
+            searchDone.value = true;
+          }
+        };
+
+        const importWikimediaImage = async (item) => {
+          if (!activeTargetScene.value) return;
+          isImporting.value = true;
+          showToast('Descargando y optimizando imagen a 1080p...');
+          try {
+            const res = await fetch('/api/import-wikimedia', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url: item.url, scene_id: activeTargetScene.value.id })
+            });
+            const data = await res.json();
+            if (data.status === 'ok') {
+              await loadProject();
+              showWikiModal.value = false;
+              showToast(`✓ Imagen añadida a Escena ${activeTargetScene.value.id}`);
+            }
+          } catch (err) {
+            alert('Error importando: ' + err);
+          } finally {
+            isImporting.value = false;
+          }
+        };
+
+        const openLibraryModal = (sc) => {
+          activeTargetScene.value = sc;
+          showLibraryModal.value = true;
+        };
+
+        const pickFromLibrary = (item) => {
+          if (!activeTargetScene.value) return;
+          selectMediaForScene(activeTargetScene.value, item);
+          if (!activeTargetScene.value.candidates.some(c => c.name === item.name)) {
+            activeTargetScene.value.candidates.unshift(item);
+          }
+          showLibraryModal.value = false;
+        };
+
+        const startRender = async () => {
+          await saveProject();
+          showRenderModal.value = true;
+          try {
+            await fetch('/api/render', { method: 'POST' });
+            pollRenderStatus();
+          } catch (e) {
+            console.error(e);
+          }
+        };
+
+        const pollRenderStatus = () => {
+          const interval = setInterval(async () => {
+            try {
+              const res = await fetch('/api/render/status');
+              renderStatus.value = await res.json();
+              if (renderStatus.value.done || renderStatus.value.error || !renderStatus.value.running) {
+                clearInterval(interval);
+              }
+            } catch (e) {
+              clearInterval(interval);
+            }
+          }, 1500);
+        };
+
+        const openVideoModal = () => { showVideoModal.value = true; };
+
+        onMounted(() => {
+          loadProject();
+        });
+
+        return {
+          project, selectedActFilter, filteredScenes,
+          isSaving, toastMsg, isPlayingMusic, activeVoiceId,
+          showVideoModal, showLibraryModal, showWikiModal, showRenderModal, showVoiceModal,
+          selectedVoiceId, voiceRegenStatus,
+          wikiQuery, wikiResults, isSearchingWiki, isImporting, searchDone,
+          renderStatus, soundtrackAudio, voiceAudio, sfxAudio, sampleVoiceAudio, fileInput, musicInput,
+          toggleSoundtrack, onSoundtrackChange, triggerMusicUpload, onMusicUploaded,
+          playSceneVoice, playSFX, selectMediaForScene, deleteCandidate,
+          saveProject, triggerFileUpload, onFileUploaded,
+          openVoiceModal, playVoiceSample, applyNewVoice,
+          openWikimediaModal, searchWikimedia, importWikimediaImage,
+          openLibraryModal, pickFromLibrary, startRender, openVideoModal
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
