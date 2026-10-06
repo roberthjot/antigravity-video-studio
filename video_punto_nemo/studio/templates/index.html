@@ -32,6 +32,26 @@
     ::-webkit-scrollbar-track { background: #070b14; }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #0891b2; }
+  
+    /* Striped pattern for cut silences */
+    .bg-striped-cut {
+      background: repeating-linear-gradient(
+        -45deg,
+        rgba(239, 68, 68, 0.45),
+        rgba(239, 68, 68, 0.45) 6px,
+        rgba(239, 68, 68, 0.15) 6px,
+        rgba(239, 68, 68, 0.15) 12px
+      );
+      border: 1px dashed rgba(239, 68, 68, 0.8);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
+      50% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.8); }
+    }
+    .render-active {
+      animation: pulseGlow 1.5s infinite;
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -43,17 +63,31 @@
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
           <i class="fa-solid fa-clapperboard text-white text-lg"></i>
         </div>
-        <div>
+                <div>
           <div class="flex items-center space-x-2">
             <h1 class="font-bold text-lg text-white tracking-wide">Antigravity Video Studio</h1>
-            <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">8 MIN MASTER</span>
+            <span v-if="currentStudioTab === 'documentary'" class="px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800">16:9 MASTER</span>
+            <span v-else class="px-2 py-0.5 text-xs font-semibold rounded-full bg-rose-950 text-rose-400 border border-rose-800">9:16 VERTICAL</span>
           </div>
-          <p class="text-xs text-slate-400">Curaduría Visual, Voces y Música · El Punto Nemo</p>
+          <p class="text-xs text-slate-400">{{ currentStudioTab === 'documentary' ? 'Curaduría Visual, Voces y Música · El Punto Nemo' : 'FrutiNovela · Edición y Recorte de Silencios CapCut' }}</p>
         </div>
       </div>
 
+      <!-- Studio Mode Switcher (Unified Suite) -->
+      <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-700/80 shadow-inner">
+        <button @click="currentStudioTab = 'documentary'" :class="currentStudioTab === 'documentary' ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20' : 'text-slate-400 hover:text-white'" class="px-3.5 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-film"></i>
+          <span>Documentales (16:9)</span>
+        </button>
+        <button @click="switchToShortsTab" :class="currentStudioTab === 'shorts' ? 'bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20' : 'text-slate-400 hover:text-white'" class="px-3.5 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-mobile-screen"></i>
+          <span>FrutiNovela (CapCut 9:16)</span>
+          <span class="px-1.5 py-0.5 bg-black/40 text-cyan-200 rounded text-[9px] font-mono">Nuevo</span>
+        </button>
+      </div>
+
       <!-- Center: Music Selector & Player -->
-      <div class="flex items-center space-x-2 bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-slate-800 text-xs">
+      <div v-if="currentStudioTab === 'documentary'" class="flex items-center space-x-2 bg-slate-900/90 px-3.5 py-1.5 rounded-full border border-slate-800 text-xs">
         <i class="fa-solid fa-music text-cyan-400"></i>
         <span class="text-slate-400 font-medium hidden sm:inline">Música:</span>
         <select v-model="project.soundtrack" @change="onSoundtrackChange" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-2 py-1 outline-none max-w-[180px] truncate">
@@ -69,8 +103,27 @@
         <audio ref="soundtrackAudio" :src="'/media/music/' + (project.soundtrack || 'soundtrack_dinamico_8min.mp3')"></audio>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center space-x-2.5">
+      <!-- Shorts Header Actions -->
+      <div v-if="currentStudioTab === 'shorts'" class="flex items-center space-x-2 text-xs">
+        <div class="hidden xl:flex items-center space-x-3 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800 text-xs text-slate-300">
+          <span>Duración: <strong class="text-cyan-400 font-mono">{{ formatTime(shortsData.total_duration) }}</strong></span>
+          <span class="text-slate-600">•</span>
+          <span>Silencios Ahorrados: <strong class="text-rose-400 font-mono">{{ calculateShortsSavings() }}s</strong></span>
+          <span class="text-slate-600">•</span>
+          <span class="text-emerald-400 font-medium"><i class="fa-solid fa-circle text-[8px] mr-1"></i>Master Listo</span>
+        </div>
+        <button @click="showShortsSilenceModal = true" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 font-semibold flex items-center space-x-1.5 border border-slate-700 transition">
+          <i class="fa-solid fa-bolt"></i>
+          <span>Calibrar Silencios (dB)</span>
+        </button>
+        <button @click="renderShortsMaster" :disabled="isShortsRendering" class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 hover:from-cyan-300 hover:to-indigo-500 text-slate-950 font-bold flex items-center space-x-1.5 shadow-lg shadow-cyan-500/25 transition">
+          <i :class="isShortsRendering ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-rocket'"></i>
+          <span>{{ isShortsRendering ? 'Renderizando...' : 'Renderizar Cambios' }}</span>
+        </button>
+      </div>
+
+      <!-- Action Buttons (Documentary Mode) -->
+      <div v-if="currentStudioTab === 'documentary'" class="flex items-center space-x-2.5">
         <button @click="openVoiceModal" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center space-x-1.5 transition border border-slate-700">
           <i class="fa-solid fa-microphone-lines text-cyan-400"></i>
           <span>Cambiar Voz</span>
@@ -90,6 +143,7 @@
       </div>
     </header>
 
+    <div v-show="currentStudioTab === 'documentary'" class="flex-1 flex flex-col min-h-0">
     <!-- SUBHEADER / ACT FILTER BAR -->
     <div class="bg-slate-900/60 border-b border-slate-800/80 px-6 py-2.5 flex items-center justify-between text-xs overflow-x-auto">
       <div class="flex items-center space-x-2 min-w-max">
@@ -375,6 +429,393 @@
               <p class="text-[11px] text-slate-300 truncate mt-1.5 px-1">{{ item.title || item.name }}</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    </div> <!-- /End Documentary View -->
+
+    <!-- ============================================================== -->
+    <!-- MÓDULO SHORTS & TIKTOK 9:16 (FRUTINOVELA CAPCUT STUDIO)        -->
+    <!-- ============================================================== -->
+    <div v-show="currentStudioTab === 'shorts'" class="flex-1 flex flex-col min-h-0 bg-[#090d16]">
+      
+      <!-- UPPER SECTION: 9:16 PLAYER & CAPCUT INSPECTOR -->
+      <section class="h-[440px] p-4 flex gap-4 shrink-0 bg-[#0c101c] border-b border-slate-800">
+        
+        <!-- 9:16 VIDEO MONITOR -->
+        <div class="w-[330px] bg-slate-900/90 rounded-2xl border border-slate-800 p-3.5 flex flex-col items-center justify-between shadow-2xl shrink-0">
+          
+          <!-- Source switch buttons -->
+          <div class="w-full flex items-center justify-between text-xs mb-1.5">
+            <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+              <button @click="switchShortsSource('master')" :class="shortsSourceMode === 'master' ? 'bg-cyan-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'" class="px-2.5 py-1 rounded-md text-[11px] transition">
+                🎬 Master Final
+              </button>
+              <button @click="switchShortsSource('raw')" :class="shortsSourceMode === 'raw' ? 'bg-cyan-500 text-slate-950 font-bold shadow' : 'text-slate-400 hover:text-white'" class="px-2.5 py-1 rounded-md text-[11px] transition">
+                🎞️ Clip Crudo (kX)
+              </button>
+            </div>
+            <span class="text-[10px] text-cyan-400 font-mono truncate max-w-[120px]">
+              {{ shortsSourceMode === 'master' ? 'Master (96.2s)' : (currentShortClip ? currentShortClip.filename : '') }}
+            </span>
+          </div>
+
+          <!-- Phone Viewport Frame (9:16) -->
+          <div class="relative w-[180px] h-[320px] bg-black rounded-xl overflow-hidden border border-slate-700 shadow-2xl flex items-center justify-center group">
+            <video ref="shortsVideoPlayer" :src="shortsVideoSrc" class="w-full h-full object-cover" playsinline preload="auto"></video>
+            
+            <div class="absolute top-2 left-2 pointer-events-none">
+              <span class="bg-black/80 backdrop-blur-md border border-white/10 text-[10px] font-mono px-2 py-0.5 rounded text-white shadow">
+                Escena {{ selectedShortClipIndex }} / {{ shortsData.clips.length }}
+              </span>
+            </div>
+
+            <!-- Center Play Overlay -->
+            <div @click="toggleShortsPlay" class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition cursor-pointer">
+              <div class="w-12 h-12 rounded-full bg-cyan-500/90 text-slate-950 flex items-center justify-center text-xl shadow-lg transform group-hover:scale-105 transition">
+                <i :class="isShortsPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play'"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transport bar -->
+          <div class="w-full flex items-center justify-between text-xs mt-2 px-1 text-slate-400">
+            <div class="flex items-center gap-1">
+              <button @click="stepShortsFrame(-1)" title="Retroceder 1 frame" class="p-1 hover:text-white"><i class="fa-solid fa-backward-step"></i></button>
+              <button @click="toggleShortsPlay" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs">
+                {{ isShortsPlaying ? 'Pausa' : 'Play' }}
+              </button>
+              <button @click="stepShortsFrame(1)" title="Avanzar 1 frame" class="p-1 hover:text-white"><i class="fa-solid fa-forward-step"></i></button>
+              <button @click="seekShortsRelative(-3)" class="text-[11px] px-1 hover:text-white font-mono">-3s</button>
+              <button @click="seekShortsRelative(3)" class="text-[11px] px-1 hover:text-white font-mono">+3s</button>
+            </div>
+            <div class="flex items-center gap-1 font-mono text-[11px]">
+              <span class="text-cyan-400 font-bold">{{ formatTime(shortsCurrentTime) }}</span>
+              <span class="text-slate-600">/</span>
+              <span class="text-slate-400">{{ formatTime(shortsData.total_duration) }}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: SCENE INSPECTOR & EDITING CONTROLS -->
+        <div v-if="currentShortClip" class="flex-1 bg-slate-900/90 rounded-2xl border border-slate-800 p-4 flex flex-col justify-between overflow-y-auto shadow-2xl">
+          
+          <!-- Scene Title & Info Header -->
+          <div class="flex items-start justify-between pb-3 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <img :src="'/media/shorts/thumbs/' + currentShortClip.filename.replace('.mp4', '.jpg')" alt="Thumbnail" class="w-14 h-20 rounded-xl object-cover border border-slate-700 shadow-md shrink-0">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-cyan-300 font-bold font-mono">
+                    ESCENA {{ currentShortClip.index }} / {{ shortsData.clips.length }}
+                  </span>
+                  <span class="text-xs px-2 py-0.5 rounded font-bold" :style="{ backgroundColor: currentShortClip.color + '22', color: currentShortClip.color, border: '1px solid ' + currentShortClip.color + '66' }">
+                    {{ currentShortClip.char }}
+                  </span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono uppercase">
+                    {{ currentShortClip.tag }}
+                  </span>
+                </div>
+                <h2 class="text-base font-bold text-white mt-1">
+                  {{ currentShortClip.title }}
+                </h2>
+                <p class="text-xs text-slate-400 font-mono">
+                  Archivo: {{ currentShortClip.filename }} • En Timeline: {{ formatTime(currentShortClip.timeline_start) }} - {{ formatTime(currentShortClip.timeline_end) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Scene Quick Nav -->
+            <div class="flex items-center gap-1.5">
+              <button @click="selectPrevShortClip" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition border border-slate-700">
+                <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+              </button>
+              <button @click="playCurrentShortClipOnly" class="px-3 py-1.5 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-xs text-cyan-300 font-medium flex items-center gap-1.5 transition shadow">
+                <i class="fa-solid fa-play"></i> Escuchar Escena
+              </button>
+              <button @click="selectNextShortClip" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition border border-slate-700">
+                Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dialogue Box -->
+          <div class="my-2 p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">
+              Guion / Diálogo de la Escena:
+            </span>
+            <p class="text-xs text-slate-200 italic leading-relaxed">
+              "{{ currentShortClip.dialogue }}"
+            </p>
+          </div>
+
+          <!-- EDITING CONTROLS FOR THIS CLIP (TRIM IN / OUT) -->
+          <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-scissors"></i> Editor de Recorte Milimétrico (Trim)
+              </span>
+              <div class="flex gap-2">
+                <button @click="setShortTrimCurrent('start')" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Fijar Inicio en el tiempo actual (Mark In)">
+                  📍 Iniciar Aquí
+                </button>
+                <button @click="setShortTrimCurrent('end')" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition" title="Fijar Final en el tiempo actual (Mark Out)">
+                  📍 Finalizar Aquí
+                </button>
+                <button @click="resetShortTrim(currentShortClip)" class="text-[10px] px-2 py-0.5 rounded bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 transition">
+                  Restaurar Original
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <!-- Start Trim Editor -->
+              <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-slate-400 text-[11px]">Silencio Inicial a Cortar:</span>
+                  <span class="font-mono font-bold text-rose-400">{{ currentShortClip.start_trim.toFixed(2) }}s</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button @click="adjustShortStartTrim(-0.2)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">-0.2s</button>
+                  <button @click="adjustShortStartTrim(-0.05)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">-0.05</button>
+                  <input type="number" step="0.01" min="0" :max="currentShortClip.end_trim - 0.5" v-model.number="currentShortClip.start_trim" @change="onShortTrimChange" class="w-16 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-center font-mono text-white text-xs">
+                  <button @click="adjustShortStartTrim(0.05)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">+0.05</button>
+                  <button @click="adjustShortStartTrim(0.2)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">+0.2s</button>
+                </div>
+              </div>
+
+              <!-- End Trim Editor -->
+              <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-slate-400 text-[11px]">Punto de Corte Final:</span>
+                  <span class="font-mono font-bold text-emerald-400">{{ currentShortClip.end_trim.toFixed(2) }}s</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button @click="adjustShortEndTrim(-0.2)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">-0.2s</button>
+                  <button @click="adjustShortEndTrim(-0.05)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">-0.05</button>
+                  <input type="number" step="0.01" :min="currentShortClip.start_trim + 0.5" :max="currentShortClip.total_duration" v-model.number="currentShortClip.end_trim" @change="onShortTrimChange" class="w-16 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-center font-mono text-white text-xs">
+                  <button @click="adjustShortEndTrim(0.05)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">+0.05</button>
+                  <button @click="adjustShortEndTrim(0.2)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px]">+0.2s</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Internal Pauses Box -->
+          <div class="p-2.5 rounded-xl bg-amber-950/20 border border-amber-800/40 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base"></i>
+              <div>
+                <span class="font-bold text-amber-300 text-[11px] block">
+                  Pausas Intermedias en el Diálogo (Sin Recortar):
+                </span>
+                <span class="text-[11px] text-slate-300">
+                  {{ currentShortClip.internal_pauses && currentShortClip.internal_pauses.length > 0 ? currentShortClip.internal_pauses.length + ' pausa(s) detectada(s) en medio de las frases.' : 'Diálogo fluido y continuo (sin pausas interactivas).' }}
+                </span>
+              </div>
+            </div>
+            <div v-if="currentShortClip.internal_pauses && currentShortClip.internal_pauses.length > 0" class="flex gap-1.5">
+              <button v-for="(p, idx) in currentShortClip.internal_pauses" :key="idx" @click="seekShortsTo(p.timeline_pos); if (shortsVideoPlayer) shortsVideoPlayer.play();" class="px-2 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[10px] transition shadow">
+                Escuchar Pausa #{{ idx + 1 }} ({{ p.duration }}s)
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- LOWER SECTION: CAPCUT TIMELINE -->
+      <section class="flex-1 flex flex-col bg-[#080b13] relative overflow-hidden">
+        
+        <!-- Timeline Toolbar -->
+        <div class="h-10 border-b border-slate-800 bg-slate-900/90 px-4 flex items-center justify-between shrink-0 text-xs">
+          <div class="flex items-center gap-3">
+            <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Línea de Tiempo Multipista
+            </span>
+            <div class="h-4 w-px bg-slate-700"></div>
+            <div class="flex items-center gap-3 text-[11px] text-slate-400">
+              <span class="flex items-center gap-1"><span class="w-3 h-2 rounded bg-cyan-600 inline-block"></span> Video Útil</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-2 rounded bg-rose-500/50 border border-rose-500 inline-block"></span> ✂️ Silencio Cortado</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-2 rounded bg-amber-500/60 inline-block"></span> ⚠️ Pausa Intermedia</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-2 rounded bg-purple-600 inline-block"></span> 🎵 Música BGM</span>
+            </div>
+          </div>
+
+          <!-- Zoom & Fit -->
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] text-slate-500">Zoom:</span>
+            <button @click="shortsZoom = 0.7; refreshShortsTimelineLayout();" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">70%</button>
+            <button @click="shortsZoom = 1.0; refreshShortsTimelineLayout();" class="px-2 py-0.5 rounded bg-cyan-950 border border-cyan-800 text-cyan-300 font-bold">100%</button>
+            <button @click="shortsZoom = 1.6; refreshShortsTimelineLayout();" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">160%</button>
+            <button @click="fitShortsTimeline()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">Ajustar Pantalla</button>
+          </div>
+        </div>
+
+        <!-- Scrollable Timeline -->
+        <div ref="shortsTimelineScrollContainer" class="flex-1 overflow-x-auto overflow-y-hidden relative p-3">
+          <div ref="shortsTimelineTrackArea" class="relative min-w-full h-[260px] pb-4 select-none cursor-pointer" @click="handleShortsTimelineClick">
+            
+            <!-- Time Ruler -->
+            <div class="h-6 border-b border-slate-800 relative mb-1 text-[10px] font-mono text-slate-500 select-none">
+              <div v-for="tick in shortsRulerTicks" :key="tick.sec" class="absolute top-0 bottom-0 border-l border-slate-800 pl-1" :style="{ left: tick.leftPx + 'px' }">
+                {{ tick.label }}
+              </div>
+            </div>
+
+            <!-- Track 1: Video Scenes -->
+            <div class="h-16 bg-slate-900/80 border border-slate-800 rounded-xl relative mb-2 flex items-center overflow-hidden">
+              <div class="absolute left-1 top-1 text-[9px] font-bold text-slate-400 tracking-wider uppercase z-20 pointer-events-none bg-black/70 px-1 rounded">
+                Pista 1: Video (15 Escenas)
+              </div>
+              <div class="w-full h-full relative">
+                <div v-for="clip in shortsData.clips" :key="clip.index"
+                     @click.stop="selectShortClip(clip.index); seekShortsTo(clip.timeline_start);"
+                     :class="clip.index === selectedShortClipIndex ? 'bg-slate-800 border-cyan-400 shadow-md ring-1 ring-cyan-400' : 'bg-slate-900 border-slate-800 hover:border-cyan-500/60'"
+                     class="absolute top-1 bottom-1 rounded-lg border flex items-center justify-between px-2 cursor-pointer transition-all duration-150 overflow-hidden"
+                     :style="{ left: (clip.timeline_start * shortsPxPerSec) + 'px', width: Math.max(clip.trimmed_duration * shortsPxPerSec, 24) + 'px' }">
+                  
+                  <div class="flex items-center gap-1.5 pointer-events-none truncate z-10">
+                    <img :src="'/media/shorts/thumbs/' + clip.filename.replace('.mp4', '.jpg')" class="w-6 h-9 rounded object-cover border border-white/20 shrink-0">
+                    <div class="truncate">
+                      <span class="text-[10px] font-bold text-cyan-300 font-mono">k{{ clip.index }}</span>
+                      <span class="text-[10px] text-slate-300 truncate hidden sm:inline ml-1">{{ clip.char.split(' ')[0] }}</span>
+                    </div>
+                  </div>
+                  <span class="text-[9px] font-mono text-slate-400 pointer-events-none shrink-0 z-10">{{ clip.trimmed_duration.toFixed(1) }}s</span>
+
+                  <!-- Visual Cut Indicators -->
+                  <div v-if="clip.start_trim > 0.05" class="absolute top-0 bottom-0 left-0 bg-striped-cut z-0 flex items-center justify-center" :style="{ width: Math.max(14, clip.start_trim * shortsPxPerSec * 0.7) + 'px' }" :title="'Silencio inicial cortado: ' + clip.start_trim + 's'">
+                    <span class="text-[8px]">✂️</span>
+                  </div>
+                  <div v-if="(clip.total_duration - clip.end_trim) > 0.05" class="absolute top-0 bottom-0 right-0 bg-striped-cut z-0 flex items-center justify-center" :style="{ width: Math.max(14, (clip.total_duration - clip.end_trim) * shortsPxPerSec * 0.7) + 'px' }" :title="'Silencio final cortado: ' + (clip.total_duration - clip.end_trim).toFixed(2) + 's'">
+                    <span class="text-[8px]">✂️</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Track 2: Speech Waveforms & Silence Detection -->
+            <div class="h-14 bg-slate-900/80 border border-slate-800 rounded-xl relative mb-2 flex items-center overflow-hidden">
+              <div class="absolute left-1 top-1 text-[9px] font-bold text-emerald-400/80 tracking-wider uppercase z-20 pointer-events-none bg-black/70 px-1 rounded">
+                Pista 2: Voz y Detección de Silencios (-28dB)
+              </div>
+              <div class="w-full h-full relative">
+                <div v-for="clip in shortsData.clips" :key="'wave-' + clip.index"
+                     class="absolute top-0 bottom-0 flex items-center border-r border-slate-800/80"
+                     :style="{ left: (clip.timeline_start * shortsPxPerSec) + 'px', width: (clip.trimmed_duration * shortsPxPerSec) + 'px' }">
+                  
+                  <!-- Waveform SVG -->
+                  <svg class="w-full h-full" :viewBox="'0 0 ' + (clip.waveform ? clip.waveform.length : 20) + ' 100'" preserveAspectRatio="none">
+                    <rect v-for="(peak, pIdx) in (clip.waveform || [])" :key="pIdx" :x="pIdx" :y="(100 - peak * 75) / 2" width="0.75" :height="peak * 75" fill="#10b981" rx="0.3" opacity="0.85"></rect>
+                  </svg>
+
+                  <!-- Internal Pauses Badges -->
+                  <div v-for="(pause, pauseIdx) in (clip.internal_pauses || [])" :key="'pause-' + pauseIdx"
+                       @click.stop="selectShortClip(clip.index); seekShortsTo(pause.timeline_pos);"
+                       class="absolute top-1 bottom-1 bg-amber-500/70 border border-amber-300 rounded flex items-center justify-center text-[9px] font-bold text-slate-950 cursor-pointer hover:bg-amber-400 shadow-md z-10"
+                       :style="{ left: ((pause.timeline_pos - clip.timeline_start) * shortsPxPerSec) + 'px', width: Math.max(18, pause.duration * shortsPxPerSec) + 'px' }"
+                       :title="'Pausa interna: ' + pause.duration + 's. Clic para escuchar'">
+                    ⚠️ {{ pause.duration }}s
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Track 3: BGM Music -->
+            <div class="h-12 bg-slate-900/80 border border-slate-800 rounded-xl relative flex items-center overflow-hidden">
+              <div class="absolute left-1 top-1 text-[9px] font-bold text-purple-400 tracking-wider uppercase z-20 pointer-events-none bg-black/70 px-1 rounded">
+                Pista 3: Música de Fondo (music-frutas.mp3)
+              </div>
+              <div class="w-full h-full relative">
+                <div class="absolute top-1 bottom-1 left-0 rounded-lg bg-gradient-to-r from-purple-900/80 via-purple-700/80 to-purple-600/40 border border-purple-500/60 flex items-center justify-between px-3 text-xs text-purple-200"
+                     :style="{ width: (shortsData.total_duration * shortsPxPerSec) + 'px' }">
+                  <div class="flex items-center gap-2 pointer-events-none">
+                    <i class="fa-solid fa-music"></i>
+                    <span class="font-mono text-[11px] font-medium">music-frutas.mp3 (100% Volumen)</span>
+                  </div>
+                  <div class="flex items-center gap-1 bg-black/40 px-2 py-0.5 rounded border border-purple-400/40 text-[10px] font-mono text-purple-300">
+                    <span>📉 Fade Out Final (2.5s)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Draggable Playhead Needle -->
+            <div class="absolute top-0 bottom-0 w-[2px] bg-rose-500 z-50 pointer-events-none" :style="{ left: (shortsCurrentTime * shortsPxPerSec) + 'px' }">
+              <div class="playhead-handle -translate-x-1/2 -top-1 w-3.5 h-3.5 bg-rose-500 rounded-sm rotate-45 border border-white shadow-lg pointer-events-auto cursor-ew-resize"></div>
+              <div class="absolute -top-6 -translate-x-1/2 px-1.5 py-0.5 rounded bg-rose-600 text-[10px] font-mono text-white font-bold whitespace-nowrap shadow-md pointer-events-none">
+                {{ formatTime(shortsCurrentTime) }}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- MODAL: AUTO-SILENCE CALIBRATION (DECIBELS & PADDING) -->
+    <div v-if="showShortsSilenceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 text-slate-200 shadow-2xl">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>Calibración de Silencios Automática (FFmpeg)</span>
+          </h3>
+          <button @click="showShortsSilenceModal = false" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div class="my-4 space-y-4 text-xs">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">
+              Umbral de Silencio (dB):
+            </label>
+            <div class="flex items-center gap-3">
+              <input type="range" min="-38" max="-20" step="1" v-model.number="shortsThreshold" class="flex-1 accent-cyan-400">
+              <span class="font-mono font-bold text-cyan-400 w-16 text-right">{{ shortsThreshold }} dB</span>
+            </div>
+            <span class="text-[10px] text-slate-500 mt-0.5 block">
+              -28dB es estándar. -32dB es más estricto (corta más pausas).
+            </span>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">
+              Margen de Respiración de Entrada (Padding):
+            </label>
+            <div class="flex items-center gap-3">
+              <input type="range" min="0.02" max="0.15" step="0.01" v-model.number="shortsPadding" class="flex-1 accent-cyan-400">
+              <span class="font-mono font-bold text-emerald-400 w-16 text-right">{{ shortsPadding.toFixed(2) }} s</span>
+            </div>
+            <span class="text-[10px] text-slate-500 mt-0.5 block">
+              Margen antes de la primera consonante para no comerse palabras.
+            </span>
+          </div>
+
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">
+              Duración Mínima de Silencio:
+            </label>
+            <select v-model.number="shortsMinDur" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200">
+              <option :value="0.20">0.20 segundos (Corte agresivo / ráfaga)</option>
+              <option :value="0.25">0.25 segundos (Estándar dinámico)</option>
+              <option :value="0.35">0.35 segundos (Conservador / pausas suaves)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+          <button @click="showShortsSilenceModal = false" class="px-3.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs hover:bg-slate-700">
+            Cancelar
+          </button>
+          <button @click="applyShortsAutoSilence" class="px-4 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition">
+            ⚡ Re-analizar 15 Clips
+          </button>
         </div>
       </div>
     </div>
@@ -776,11 +1217,384 @@
 
         const openVideoModal = () => { showVideoModal.value = true; };
 
+        const formatTime = (sec) => {
+          if (sec === undefined || sec === null || isNaN(sec)) return '00:00.0';
+          const m = Math.floor(sec / 60);
+          const s = Math.floor(sec % 60);
+          const ms = Math.floor((sec % 1) * 10);
+          return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}.${ms}`;
+        };
+
         onMounted(() => {
           loadProject();
+          loadShortsProject();
         });
 
+        
+        // ==========================================
+        // ESTADO Y MÉTODOS SHORTS / FRUTINOVELA 9:16
+        // ==========================================
+        const currentStudioTab = ref('documentary');
+        const shortsData = ref({ total_duration: 96.08, clips: [] });
+        const selectedShortClipIndex = ref(1);
+        const shortsSourceMode = ref('master');
+        const shortsCurrentTime = ref(0.0);
+        const shortsZoom = ref(1.0);
+        const isShortsPlaying = ref(false);
+        const isShortsRendering = ref(false);
+        const showShortsSilenceModal = ref(false);
+        const shortsThreshold = ref(-28);
+        const shortsPadding = ref(0.06);
+        const shortsMinDur = ref(0.25);
+        const shortsVideoPlayer = ref(null);
+        const shortsTimelineScrollContainer = ref(null);
+        const shortsTimelineTrackArea = ref(null);
+
+        const currentShortClip = computed(() => {
+          if (!shortsData.value.clips || shortsData.value.clips.length === 0) return null;
+          return shortsData.value.clips.find(c => c.index === selectedShortClipIndex.value) || shortsData.value.clips[0];
+        });
+
+        const shortsVideoSrc = computed(() => {
+          if (shortsSourceMode.value === 'master') {
+            return `/media/shorts/CAPITULO_2_FINAL.mp4?t=${shortsData.value.last_render || 1}`;
+          }
+          if (currentShortClip.value) {
+            return `/media/shorts/${currentShortClip.value.filename}`;
+          }
+          return '/media/shorts/CAPITULO_2_FINAL.mp4';
+        });
+
+        const shortsPxPerSec = computed(() => {
+          const containerWidth = shortsTimelineScrollContainer.value ? (shortsTimelineScrollContainer.value.clientWidth - 30) : 1100;
+          const base = Math.max(containerWidth / (shortsData.value.total_duration || 96), 12);
+          return base * shortsZoom.value;
+        });
+
+        const shortsRulerTicks = computed(() => {
+          const ticks = [];
+          const total = shortsData.value.total_duration || 96;
+          const pxPerSec = shortsPxPerSec.value;
+          const step = shortsZoom.value > 1.3 ? 2 : (shortsZoom.value < 0.8 ? 10 : 5);
+
+          for (let sec = 0; sec <= total; sec += step) {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            ticks.push({
+              sec,
+              leftPx: sec * pxPerSec,
+              label: `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+            });
+          }
+          return ticks;
+        });
+
+        const calculateShortsSavings = () => {
+          if (!shortsData.value.clips) return '0.00';
+          let saved = 0.0;
+          shortsData.value.clips.forEach(c => {
+            saved += (c.total_duration - c.trimmed_duration);
+          });
+          return saved.toFixed(2);
+        };
+
+        const loadShortsProject = async () => {
+          try {
+            const res = await fetch('/api/shorts/project');
+            shortsData.value = await res.json();
+            recalcShortsPositions();
+          } catch (e) {
+            console.error('Error cargando shorts project:', e);
+          }
+        };
+
+        const recalcShortsPositions = () => {
+          let cur = 0.0;
+          shortsData.value.clips.forEach(clip => {
+            clip.timeline_start = Math.round(cur * 1000) / 1000;
+            clip.trimmed_duration = Math.round((clip.end_trim - clip.start_trim) * 1000) / 1000;
+            clip.timeline_end = Math.round((cur + clip.trimmed_duration) * 1000) / 1000;
+            cur += clip.trimmed_duration;
+          });
+          shortsData.value.total_duration = Math.round(cur * 1000) / 1000;
+        };
+
+        const switchToShortsTab = async () => {
+          currentStudioTab.value = 'shorts';
+          if (!shortsData.value.clips || shortsData.value.clips.length === 0) {
+            await loadShortsProject();
+          }
+          setupShortsVideoEvents();
+        };
+
+        const setupShortsVideoEvents = () => {
+          setTimeout(() => {
+            if (!shortsVideoPlayer.value) return;
+            const v = shortsVideoPlayer.value;
+            v.ontimeupdate = () => {
+              if (shortsSourceMode.value === 'master') {
+                shortsCurrentTime.value = v.currentTime;
+              } else if (currentShortClip.value) {
+                const clip = currentShortClip.value;
+                shortsCurrentTime.value = clip.timeline_start + Math.max(0, v.currentTime - clip.start_trim);
+              }
+              // Auto highlight active clip
+              const active = shortsData.value.clips.find(c => shortsCurrentTime.value >= c.timeline_start && shortsCurrentTime.value < c.timeline_end);
+              if (active && active.index !== selectedShortClipIndex.value) {
+                selectedShortClipIndex.value = active.index;
+              }
+            };
+            v.onplay = () => { isShortsPlaying.value = true; };
+            v.onpause = () => { isShortsPlaying.value = false; };
+          }, 300);
+        };
+
+        const selectShortClip = (index) => {
+          selectedShortClipIndex.value = index;
+        };
+
+        const selectPrevShortClip = () => {
+          const prev = Math.max(1, selectedShortClipIndex.value - 1);
+          selectedShortClipIndex.value = prev;
+          const clip = shortsData.value.clips.find(c => c.index === prev);
+          if (clip) seekShortsTo(clip.timeline_start);
+        };
+
+        const selectNextShortClip = () => {
+          const next = Math.min(shortsData.value.clips.length, selectedShortClipIndex.value + 1);
+          selectedShortClipIndex.value = next;
+          const clip = shortsData.value.clips.find(c => c.index === next);
+          if (clip) seekShortsTo(clip.timeline_start);
+        };
+
+        const playCurrentShortClipOnly = () => {
+          if (!currentShortClip.value || !shortsVideoPlayer.value) return;
+          seekShortsTo(currentShortClip.value.timeline_start);
+          shortsVideoPlayer.value.play();
+        };
+
+        const toggleShortsPlay = () => {
+          if (!shortsVideoPlayer.value) return;
+          if (shortsVideoPlayer.value.paused) {
+            shortsVideoPlayer.value.play();
+          } else {
+            shortsVideoPlayer.value.pause();
+          }
+        };
+
+        const seekShortsTo = (sec) => {
+          if (!shortsVideoPlayer.value) return;
+          const v = shortsVideoPlayer.value;
+          if (shortsSourceMode.value === 'master') {
+            v.currentTime = Math.max(0, Math.min(shortsData.value.total_duration, sec));
+          } else if (currentShortClip.value) {
+            const clip = currentShortClip.value;
+            const rawSec = (sec - clip.timeline_start) + clip.start_trim;
+            v.currentTime = Math.max(0, Math.min(clip.total_duration, rawSec));
+          }
+          shortsCurrentTime.value = sec;
+        };
+
+        const seekShortsRelative = (delta) => {
+          if (!shortsVideoPlayer.value) return;
+          seekShortsTo(shortsVideoPlayer.value.currentTime + delta);
+        };
+
+        const stepShortsFrame = (frames) => {
+          if (!shortsVideoPlayer.value) return;
+          shortsVideoPlayer.value.pause();
+          seekShortsTo(shortsVideoPlayer.value.currentTime + frames * (1 / 24));
+        };
+
+        const switchShortsSource = (mode) => {
+          shortsSourceMode.value = mode;
+          setTimeout(() => {
+            if (shortsVideoPlayer.value) {
+              shortsVideoPlayer.value.load();
+              shortsVideoPlayer.value.play().catch(() => {});
+            }
+          }, 100);
+        };
+
+        const handleShortsTimelineClick = (e) => {
+          if (!shortsTimelineTrackArea.value) return;
+          const rect = shortsTimelineTrackArea.value.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          const targetSec = clickX / shortsPxPerSec.value;
+          seekShortsTo(targetSec);
+        };
+
+        const refreshShortsTimelineLayout = () => {
+          recalcShortsPositions();
+        };
+
+        const fitShortsTimeline = () => {
+          if (!shortsTimelineScrollContainer.value) return;
+          const containerWidth = shortsTimelineScrollContainer.value.clientWidth - 40;
+          shortsZoom.value = containerWidth / ((shortsData.value.total_duration || 96) * 12);
+        };
+
+        // Trim Steppers & Editing
+        const adjustShortStartTrim = (delta) => {
+          const clip = currentShortClip.value;
+          if (!clip) return;
+          clip.start_trim = Math.max(0.0, Math.min(clip.end_trim - 0.5, Math.round((clip.start_trim + delta) * 100) / 100));
+          recalcShortsPositions();
+          showToast(`✂️ Corte inicial fijado en ${clip.start_trim}s`);
+        };
+
+        const adjustShortEndTrim = (delta) => {
+          const clip = currentShortClip.value;
+          if (!clip) return;
+          clip.end_trim = Math.max(clip.start_trim + 0.5, Math.min(clip.total_duration, Math.round((clip.end_trim + delta) * 100) / 100));
+          recalcShortsPositions();
+          showToast(`✂️ Corte final fijado en ${clip.end_trim}s`);
+        };
+
+        const onShortTrimChange = () => {
+          recalcShortsPositions();
+        };
+
+        const setShortTrimCurrent = (type) => {
+          const clip = currentShortClip.value;
+          if (!clip || !shortsVideoPlayer.value) return;
+          const cur = shortsVideoPlayer.value.currentTime;
+          let clipTime = cur;
+          if (shortsSourceMode.value === 'master') {
+            clipTime = (cur - clip.timeline_start) + clip.start_trim;
+          }
+          clipTime = Math.max(0.0, Math.min(clip.total_duration, Math.round(clipTime * 100) / 100));
+
+          if (type === 'start') {
+            if (clipTime < clip.end_trim - 0.3) {
+              clip.start_trim = clipTime;
+              showToast(`📍 Inicio de Escena ${clip.index} fijado en ${clipTime}s`);
+            }
+          } else {
+            if (clipTime > clip.start_trim + 0.3) {
+              clip.end_trim = clipTime;
+              showToast(`📍 Final de Escena ${clip.index} fijado en ${clipTime}s`);
+            }
+          }
+          recalcShortsPositions();
+        };
+
+        const resetShortTrim = (clip) => {
+          if (!clip) return;
+          clip.start_trim = 0.0;
+          clip.end_trim = clip.total_duration;
+          recalcShortsPositions();
+          showToast(`🔄 Escena ${clip.index} restaurada al metraje completo`);
+        };
+
+        // Render Master Video
+        const renderShortsMaster = async () => {
+          isShortsRendering.value = true;
+          showToast('🚀 Renderizando 15 escenas con FFmpeg en segundo plano...');
+          try {
+            const payload = {
+              clips: shortsData.value.clips.map(c => ({
+                filename: c.filename,
+                start_trim: c.start_trim,
+                end_trim: c.end_trim
+              })),
+              music_file: 'music-frutas.mp3',
+              music_volume: 1.0,
+              fade_out: 2.5
+            };
+
+            const res = await fetch('/api/shorts/render', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.ok) {
+              shortsData.value.last_render = Date.now();
+              showToast(`✓ ¡Video master listo! Duración: ${data.total_duration}s`);
+              if (shortsVideoPlayer.value) {
+                shortsVideoPlayer.value.load();
+                shortsVideoPlayer.value.play().catch(() => {});
+              }
+            } else {
+              alert('Error al renderizar: ' + (data.error || 'Desconocido'));
+            }
+          } catch (e) {
+            alert('Error al renderizar: ' + e.message);
+          } finally {
+            isShortsRendering.value = false;
+          }
+        };
+
+        // Apply dynamic silence detection
+        const applyShortsAutoSilence = async () => {
+          showShortsSilenceModal.value = false;
+          showToast(`⚡ Analizando audio a ${shortsThreshold.value}dB...`);
+          try {
+            const res = await fetch('/api/shorts/detect_silence', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                threshold_db: shortsThreshold.value,
+                min_duration: shortsMinDur.value,
+                lead_padding: shortsPadding.value,
+                trail_padding: shortsPadding.value + 0.05
+              })
+            });
+            const data = await res.json();
+            if (data.ok) {
+              shortsData.value = data.data;
+              recalcShortsPositions();
+              showToast(`✓ Silencios recalibrados a ${shortsThreshold.value}dB`);
+            }
+          } catch (e) {
+            alert('Error calibrando silencios: ' + e.message);
+          }
+        };
+
         return {
+          formatTime,
+          openVideoModal,
+          currentStudioTab,
+          shortsData,
+          selectedShortClipIndex,
+          currentShortClip,
+          shortsSourceMode,
+          shortsCurrentTime,
+          shortsZoom,
+          isShortsPlaying,
+          isShortsRendering,
+          showShortsSilenceModal,
+          shortsThreshold,
+          shortsPadding,
+          shortsMinDur,
+          shortsVideoPlayer,
+          shortsTimelineScrollContainer,
+          shortsTimelineTrackArea,
+          shortsVideoSrc,
+          shortsPxPerSec,
+          shortsRulerTicks,
+          calculateShortsSavings,
+          switchToShortsTab,
+          selectShortClip,
+          selectPrevShortClip,
+          selectNextShortClip,
+          playCurrentShortClipOnly,
+          toggleShortsPlay,
+          seekShortsTo,
+          seekShortsRelative,
+          stepShortsFrame,
+          switchShortsSource,
+          handleShortsTimelineClick,
+          refreshShortsTimelineLayout,
+          fitShortsTimeline,
+          adjustShortStartTrim,
+          adjustShortEndTrim,
+          onShortTrimChange,
+          setShortTrimCurrent,
+          resetShortTrim,
+          renderShortsMaster,
+          applyShortsAutoSilence,
           project, selectedActFilter, filteredScenes,
           isSaving, toastMsg, isPlayingMusic, activeVoiceId,
           showVideoModal, showLibraryModal, showWikiModal, showRenderModal, showVoiceModal,

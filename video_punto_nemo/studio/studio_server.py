@@ -15,9 +15,11 @@ from PIL import Image
 import edge_tts
 import imageio_ffmpeg
 import subprocess
+import re
 
 STUDIO_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.abspath(os.path.join(STUDIO_DIR, ".."))
+SHORTS_DIR = os.path.abspath(os.path.join(PROJECT_DIR, "..", "video_frutinovela_shorts"))
 OPTIMIZED_DIR = os.path.join(PROJECT_DIR, "optimized_1080p")
 MEDIA_DIR = os.path.join(PROJECT_DIR, "media")
 OVERLAYS_DIR = os.path.join(PROJECT_DIR, "overlays")
@@ -63,12 +65,14 @@ os.makedirs(MEDIA_DIR, exist_ok=True)
 os.makedirs(SFX_DIR, exist_ok=True)
 os.makedirs(OVERLAYS_DIR, exist_ok=True)
 os.makedirs(SRC_TEMP_DIR, exist_ok=True)
+os.makedirs(SHORTS_DIR, exist_ok=True)
 
 app.mount("/media/optimized", StaticFiles(directory=OPTIMIZED_DIR), name="optimized")
 app.mount("/media/video", StaticFiles(directory=MEDIA_DIR), name="video")
 app.mount("/media/audio", StaticFiles(directory=SRC_TEMP_DIR), name="audio")
 app.mount("/media/sfx", StaticFiles(directory=SFX_DIR), name="sfx")
 app.mount("/media/overlays", StaticFiles(directory=OVERLAYS_DIR), name="overlays")
+app.mount("/media/shorts", StaticFiles(directory=SHORTS_DIR), name="shorts")
 
 RENDER_STATUS = {
     "running": False,
@@ -523,6 +527,174 @@ async def trigger_render(background_tasks: BackgroundTasks):
 @app.get("/api/render/status")
 async def get_render_status():
     return RENDER_STATUS
+
+# ==========================================
+# MÓDULO SHORTS & TIKTOK 9:16 (FRUTINOVELA)
+# ==========================================
+
+@app.get("/api/shorts/project")
+async def get_shorts_project():
+    json_path = os.path.join(SHORTS_DIR, "clips_timeline_data.json")
+    if not os.path.exists(json_path):
+        raise HTTPException(status_code=404, detail="Shorts project data not found")
+    with open(json_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+@app.post("/api/shorts/save")
+async def save_shorts_project(payload: dict):
+    json_path = os.path.join(SHORTS_DIR, "clips_timeline_data.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+    return {"ok": True, "message": "Proyecto Shorts guardado con éxito"}
+
+@app.post("/api/shorts/detect_silence")
+async def detect_shorts_silence(payload: dict):
+    threshold_db = payload.get("threshold_db", -28)
+    min_duration = payload.get("min_duration", 0.25)
+    lead_padding = payload.get("lead_padding", 0.06)
+    trail_padding = payload.get("trail_padding", 0.12)
+    
+    json_path = os.path.join(SHORTS_DIR, "clips_timeline_data.json")
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    def run_detection():
+        timeline_cursor = 0.0
+        for clip in data["clips"]:
+            inp = os.path.join(SHORTS_DIR, clip["filename"])
+            if not os.path.exists(inp):
+                continue
+
+            total_dur = clip["total_duration"]
+            cmd_s = [FFMPEG, "-i", inp, "-af", f"silencedetect=n={threshold_db}dB:d={min_duration}", "-f", "null", "-"]
+            res_s = subprocess.run(cmd_s, stderr=subprocess.PIPE, text=True)
+
+            s_starts = [float(x) for x in re.findall(r"silence_start:\s*([\d\.]+)", res_s.stderr)]
+            s_ends = [float(x) for x in re.findall(r"silence_end:\s*([\d\.]+)", res_s.stderr)]
+
+            start_trim = 0.0
+            if s_starts and s_ends and s_starts[0] <= 0.08:
+                start_trim = max(0.0, s_ends[0] - lead_padding)
+
+            end_trim = total_dur
+            if s_starts and s_starts[-1] >= total_dur - 1.8:
+                end_trim = min(total_dur, s_starts[-1] + trail_padding)
+
+            clip_dur = end_trim - start_trim
+            clip["start_trim"] = round(start_trim, 3)
+            clip["end_trim"] = round(end_trim, 3)
+            clip["trimmed_duration"] = round(clip_dur, 3)
+            clip["timeline_start"] = round(timeline_cursor, 3)
+            clip["timeline_end"] = round(timeline_cursor + clip_dur, 3)
+            clip["silence_starts"] = s_starts
+            clip["silence_ends"] = s_ends
+
+            internal = []
+            for s_st, s_en in zip(s_starts, s_ends):
+                if s_st >= start_trim + 0.1 and s_en <= end_trim - 0.1:
+                    dur = s_en - s_st
+                    if dur >= min_duration:
+                        internal.append({
+                            "start_in_clip": round(s_st, 2),
+                            "end_in_clip": round(s_en, 2),
+                            "duration": round(dur, 2),
+                            "timeline_pos": round(timeline_cursor + (s_st - start_trim), 2)
+                        })
+            clip["internal_pauses"] = internal
+            timeline_cursor += clip_dur
+
+        data["total_duration"] = round(timeline_cursor, 3)
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return data
+
+    res_data = await asyncio.to_thread(run_detection)
+    return {"ok": True, "data": res_data}
+
+@app.post("/api/shorts/render")
+async def render_shorts(payload: dict):
+    clips_list = payload.get("clips", [])
+    music_volume = float(payload.get("music_volume", 1.0))
+    fade_out = float(payload.get("fade_out", 2.5))
+    music_file = os.path.join(SHORTS_DIR, payload.get("music_file", "music-frutas.mp3"))
+    out_video = os.path.join(SHORTS_DIR, "CAPITULO_2_FINAL.mp4")
+    temp_dir = os.path.join(SHORTS_DIR, "temp_edit")
+    os.makedirs(temp_dir, exist_ok=True)
+
+    def do_render():
+        trimmed_clips = []
+        for idx, item in enumerate(clips_list):
+            fname = item["filename"]
+            inp = os.path.join(SHORTS_DIR, fname)
+            st = max(0.0, float(item.get("start_trim", 0.0)))
+            en = float(item.get("end_trim", 6.0))
+            out_clip = os.path.join(temp_dir, f"trimmed_{idx:02d}_{fname}")
+            cmd_cut = [
+                FFMPEG, "-y",
+                "-ss", f"{st:.3f}", "-to", f"{en:.3f}",
+                "-i", inp,
+                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "19",
+                "-c:a", "aac", "-b:a", "192k",
+                out_clip
+            ]
+            subprocess.run(cmd_cut, capture_output=True, check=True)
+            trimmed_clips.append(out_clip)
+
+        concat_list = os.path.join(temp_dir, "concat_list.txt")
+        with open(concat_list, "w", encoding="utf-8") as f:
+            for c in trimmed_clips:
+                clean = c.replace("\\", "/")
+                f.write(f"file '{clean}'\n")
+
+        concat_video = os.path.join(temp_dir, "concat_temp.mp4")
+        cmd_concat = [
+            FFMPEG, "-y",
+            "-f", "concat",
+            "-safe", "0",
+            "-i", concat_list,
+            "-c", "copy",
+            concat_video
+        ]
+        subprocess.run(cmd_concat, capture_output=True, check=True)
+
+        r_v = subprocess.run([FFMPEG, "-i", concat_video], stderr=subprocess.PIPE, text=True)
+        m_v = re.search(r"Duration:\s*(\d+:\d+:\d+\.\d+)", r_v.stderr)
+        total_dur = 96.0
+        if m_v:
+            p_v = m_v.group(1).split(":")
+            total_dur = float(p_v[0])*3600 + float(p_v[1])*60 + float(p_v[2])
+
+        fade_start = max(0.0, total_dur - fade_out)
+        vol_filter = f"volume={music_volume:.2f}," if music_volume != 1.0 else ""
+        filter_complex = (
+            f"[1:a]{vol_filter}afade=t=out:st={fade_start:.2f}:d={fade_out:.2f}[bgm];"
+            f"[0:a][bgm]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+        )
+
+        cmd_final = [
+            FFMPEG, "-y",
+            "-i", concat_video,
+            "-i", music_file,
+            "-filter_complex", filter_complex,
+            "-map", "0:v",
+            "-map", "[aout]",
+            "-c:v", "copy",
+            "-c:a", "aac", "-b:a", "192k",
+            "-t", f"{total_dur:.3f}",
+            out_video
+        ]
+        subprocess.run(cmd_final, capture_output=True, check=True)
+
+        try:
+            for tf in os.listdir(temp_dir):
+                os.remove(os.path.join(temp_dir, tf))
+        except Exception:
+            pass
+
+        return round(total_dur, 2)
+
+    total_dur = await asyncio.to_thread(do_render)
+    return {"ok": True, "message": "Video Shorts renderizado con éxito", "total_duration": total_dur}
 
 if __name__ == "__main__":
     import uvicorn

@@ -31,6 +31,12 @@
 - **12 Efectos de sonido (SFX):** Sincronización milimétrica con adelanto y mezcla de volumen para ruidos de sonar abisal, rugidos de reingreso espacial, estática de radio de la ISS, crujidos de hielo en la Antártida y oleaje.
 - **11 Tarjetas infográficas animadas (Lower Thirds):** Superposiciones gráficas con transiciones automáticas de entrada y salida (`fade in / fade out`) en momentos clave de datos técnicos.
 
+### 4. 📱 Módulo Shorts, TikTok & FrutiNovela (Formato Vertical 9:16)
+- **Línea de tiempo multipista CapCut:** Visualización interactiva de escenas generadas por IA (Veo), ondas de voz reales y pista BGM con fade-out.
+- **Detector y cortador inteligente de silencios:** Análisis de audio con FFmpeg (`silencedetect`) a decibelios calibrables (`-28dB`, `-32dB`) para eliminar aire muerto al inicio y final.
+- **Detección de pausas intermedias:** Marcadores visuales de alertas para pausas dentro del diálogo y recorte milimétrico manual (Mark In / Mark Out).
+- **Renderizado directo:** Compilación instantánea con FFmpeg y recarga en caliente del master final en el navegador.
+
 ---
 
 ## 📂 Estructura del Proyecto
@@ -40,22 +46,22 @@
 ├── requirements.txt
 ├── README.md
 │
-└── video_punto_nemo/
-    ├── studio/
-    │   ├── studio_server.py        # API FastAPI y servidor web del estudio
-    │   ├── project_state.json      # Estado persistente del proyecto y escenas
-    │   └── templates/
-    │       └── index.html          # Interfaz SPA (Vue 3 + Tailwind + FontAwesome)
-    │
-    ├── subpixel_motion.py          # Motor matemático de paneo/zoom subpíxel
-    ├── render_monetizable_8min.py  # Script maestro de compilación de 32 escenas
-    ├── build_cinematic_30s_proof.py# Generador de muestras cinematográficas de 30s
-    │
-    ├── optimized_1080p/            # Fotografías optimizadas a 1920x1080
-    ├── overlays/                   # Gráficos PNG de tarjetas informativas (Lower Thirds)
-    ├── sfx/                        # Efectos sonoros (WAV/OGG) de alta fidelidad
-    ├── media/                      # Videos y metrajes de apoyo (B-roll)
-    └── INICIAR_ESTUDIO.bat         # Acceso directo para lanzar el estudio en Windows
+├── video_punto_nemo/
+│   ├── studio/
+│   │   ├── studio_server.py        # API FastAPI unificada (16:9 y 9:16)
+│   │   ├── project_state.json      # Estado del documental 16:9
+│   │   └── templates/
+│   │       └── index.html          # Interfaz SPA Unificada (Vue 3 + Tailwind)
+│   ├── subpixel_motion.py          # Motor matemático de paneo/zoom subpíxel
+│   ├── render_monetizable_8min.py  # Script maestro de compilación documental
+│   └── INICIAR_ESTUDIO.bat         # Acceso directo para lanzar el estudio en Windows
+│
+└── video_frutinovela_shorts/       # Módulo 9:16 Shorts / FrutiNovela
+    ├── k1.mp4 ... k15.mp4          # Clips animados de las 15 escenas
+    ├── thumbs/                     # Miniaturas reales de cada escena
+    ├── music-frutas.mp3            # Pista de música de fondo
+    ├── CAPITULO_2_FINAL.mp4        # Master final compilado
+    └── clips_timeline_data.json    # Metadatos, diálogos y marcas de corte
 ```
 
 ---
@@ -116,8 +122,8 @@ En `subpixel_motion.py` se implementan los siguientes movimientos cinematográfi
 
 ## 📈 Roadmap de Mejoras Futuras
 
+- [x] **Formato Vertical (9:16):** Módulo CapCut Studio para YouTube Shorts, Instagram Reels y TikTok con recorte de silencios inteligente y mezcla BGM.
 - [ ] **Generación de subtítulos automáticos:** Integración con `faster-whisper` para generar subtítulos animados palabra por palabra estilo karaoke / MrBeast.
-- [ ] **Formato Vertical (9:16):** Exportador directo para YouTube Shorts, Instagram Reels y TikTok.
 - [ ] **Transiciones dinámicas:** Disolvencias cruzadas (`crossfade`) y cortinillas cinemáticas entre escenas.
 - [ ] **Soporte de Inteligencia Artificial para Guiones:** Asistente generador de guiones y distribución de tiempos automática por temática.
 
